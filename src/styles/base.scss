@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,200;0,400;0,600;1,400;1,600&family=Public+Sans:wght@200;400;600;700&display=swap');
+/* === Variables === */
+$first-font: 'Kanit', sans-serif;
+$second-font: 'Public Sans', sans-serif;
+
+$primary-color: #1c1627;
+$sidebar-bg: linear-gradient(7deg, rgba(28,22,39,1) 0%, rgba(78,78,78,1) 100%);
+$lighter-primary-color: #352b47;
+$secondary-color: #ff6804;
+$lighter-secondary-color: #ff8432;
+$bg-color: #FFFFFF;
+$white: #FFFFFF;
+$black: #080808;
+$dark: #252331;
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* === Usable Class === */
+.ccontainer {
+    overflow: hidden;
+    max-height: 100vh;
+}
+  
+.cwrap {
+    overflow-y: auto;
+    width: 100%;
+    background-color: rgb(241, 241, 241);
+}
+
+.font-title {
+    font-family: $first-font;
+}
+
+.font-desc {
+    font-family: $second-font;
+}
