@@ -15,10 +15,6 @@
               </button>
           </div>
       </div>
-      <!-- <div class="cat-vectors">
-        <img src="@/assets/images/vector/cat1.svg" alt="Cat" class="cat">
-        <img src="@/assets/images/vector/cat2.svg" alt="Cat" class="cat">
-      </div> -->
       <div class="wave-vector">
         <img src="@/assets/images/vector/wave.svg" alt="Wave" class="wave">
       </div>
@@ -79,10 +75,20 @@ export default {
                 padding: 0.8rem 0;
                 width: 200px;
                 transition: 0.35s ease;
+                animation: wide 0.35s ease;
 
                 &:hover {
                     background: #322f42;
                     width: 220px;
+                }
+            }
+            @keyframes wide {
+                from {
+                    opacity: 0;
+                    transform: translateY(-1rem);
+                } to {
+                    opacity: 1;
+                    transform: translateY(0);
                 }
             }
             @media screen and (max-width: 768px) {

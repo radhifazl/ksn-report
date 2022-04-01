@@ -1,44 +1,9 @@
 <template>
   <div class="project-tugas-wrapper ccontainer d-flex">
-      <app-sidebar>
-        <router-link to="/user/dashboard">
-          <li class="navlist-item">
-            <i class='bx-fw bx bxs-dashboard'></i> Dashboard
-          </li>
-        </router-link>
-
-        <router-link to="/user/tugas">
-          <li class="navlist-item">
-            <i class='bx-fw bx bx-task'></i> Tugas
-          </li>
-        </router-link>
-
-        <router-link to="/user/progress">
-          <li class="navlist-item">
-            <i class='bx-fw bx bxs-report' ></i> Lapor Progress
-          </li>
-        </router-link>
-
-        <router-link to="/user/kendala">
-          <li class="navlist-item">
-            <i class='bx-fw bx bx-error'></i> Lapor Kendala
-          </li>
-        </router-link>
-
-        <router-link to="/user/contact">
-          <li class="navlist-item">
-            <i class='bx-fw bx bx-chat'></i> Kontak Admin PKL
-          </li>
-        </router-link>
-
-        <li class="navlist-item">
-          <button class="nav-logout" @click="logout">
-            <i class='bx-fw bx bxs-log-out'></i> Logout
-          </button>
-        </li>
-      </app-sidebar>
       <div class="project-tugas cwrap">
-        <page-header />
+        <page-header>
+          <user-routes />
+        </page-header>
         <div class="tugas-content p-4">
           <div class="tugas-header d-flex justify-content-between align-items-center">
             <h2 class="font-title mb-4" id="welcome-text">
@@ -188,10 +153,10 @@
 </template>
 
 <script>
-import AppSidebar from '@/components/Sidebar/AppSidebar.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
+import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
 export default {
-  components: { AppSidebar, PageHeader },
+  components: { PageHeader, UserRoutes },
   name: 'UserTugas',
   data() {
     return {

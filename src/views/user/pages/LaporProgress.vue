@@ -1,39 +1,9 @@
 <template>
   <div class="lapor-progress-wrapper ccontainer d-flex">
-    <app-sidebar>
-      <router-link to="/user/dashboard">
-        <li class="navlist-item">
-          <i class='bx-fw bx bxs-dashboard'></i> Dashboard
-        </li>
-      </router-link>
-      <router-link to="/user/tugas">
-        <li class="navlist-item">
-          <i class='bx-fw bx bx-task'></i> Tugas
-        </li>
-      </router-link>
-      <router-link to="/user/progress">
-        <li class="navlist-item">
-          <i class='bx-fw bx bxs-report' ></i> Lapor Progress
-        </li>
-      </router-link>
-      <router-link to="/user/kendala">
-        <li class="navlist-item">
-          <i class='bx-fw bx bx-error'></i> Lapor Kendala
-        </li>
-      </router-link>
-      <router-link to="/user/contact">
-        <li class="navlist-item">
-          <i class='bx-fw bx bx-chat'></i> Kontak Admin PKL
-        </li>
-      </router-link>
-      <li class="navlist-item">
-        <button class="nav-logout" @click="logout">
-          <i class='bx-fw bx bxs-log-out'></i> Logout
-        </button>
-      </li>
-    </app-sidebar>
     <div class="lapor-progress cwrap">
-      <page-header />
+      <page-header>
+        <user-routes />
+      </page-header>
 
       <div class="lapor-header d-flex justify-content-between align-items-center p-4">
           <h2 class="font-title mb-4" id="welcome-text">
@@ -103,15 +73,14 @@
 </template>
 
 <script>
-import AppSidebar from '@/components/Sidebar/AppSidebar.vue'
 import PageHeader from '@/components//Header/PageHeader.vue'
+import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
 import { auth } from '@/firebase'
 
 export default {
     name: 'LaporProgress',
     components: {
-      AppSidebar,
-      PageHeader
+      PageHeader, UserRoutes
     },
     data() {
       return {
@@ -137,6 +106,10 @@ export default {
 
 <style lang="scss">
 @import "@/styles/base.scss";
+
+.lapor-progress-wrapper {
+  background-color: rgb(241, 241, 241);
+}
 
 .laporan-container {
   .form-wrapper {

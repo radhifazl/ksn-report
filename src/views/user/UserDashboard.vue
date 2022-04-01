@@ -1,44 +1,9 @@
 <template>
   <div class="user-dashboard ccontainer d-flex">
-      <app-sidebar>
-        <router-link to="/user/dashboard">
-          <li class="navlist-item">
-            <i class='bx-fw bx bxs-dashboard'></i> Dashboard
-          </li>
-        </router-link>
-
-        <router-link to="/user/tugas">
-          <li class="navlist-item">
-            <i class='bx-fw bx bx-task'></i> Tugas
-          </li>
-        </router-link>
-
-        <router-link to="/user/progress">
-          <li class="navlist-item">
-            <i class='bx-fw bx bxs-report' ></i> Lapor Progress
-          </li>
-        </router-link>
-
-        <router-link to="/user/kendala">
-          <li class="navlist-item">
-            <i class='bx-fw bx bx-error'></i> Lapor Kendala
-          </li>
-        </router-link>
-
-        <router-link to="/user/contact">
-          <li class="navlist-item">
-            <i class='bx-fw bx bx-chat'></i> Kontak Admin PKL
-          </li>
-        </router-link>
-
-        <li class="navlist-item">
-          <button class="nav-logout" @click="logout">
-            <i class='bx-fw bx bxs-log-out'></i> Logout
-          </button>
-        </li>
-      </app-sidebar>
       <div class="user-dash-content cwrap">
-          <page-header />
+          <page-header>
+            <user-routes />
+          </page-header>
 
           <div class="dashboard-content p-4">
             <div class="welcome-text mb-4">
@@ -95,7 +60,6 @@
 </template>
 
 <script>
-import AppSidebar from '@/components/Sidebar/AppSidebar.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import { auth } from '@/firebase'
 import { Swiper, SwiperSlide } from 'swiper/vue'
@@ -103,11 +67,12 @@ import "swiper/css"
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { Pagination, Navigation } from 'swiper'
+import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
 // import { useStore } from 'vuex'
 
 export default {
   name: 'UserDashboard',
-  components: { AppSidebar, PageHeader, Swiper, SwiperSlide },
+  components: { PageHeader, Swiper, SwiperSlide, UserRoutes },
   data() {
     return {
       username: "",
@@ -161,6 +126,10 @@ export default {
 
 <style lang="scss">
   @import '@/styles/base.scss';
+
+  .user-dashboard {
+    height: 100vh;
+  }
 
   .dashboard-content {
     .welcome-text {

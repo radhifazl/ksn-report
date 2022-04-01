@@ -61,9 +61,9 @@ const routes = [
     }
   },
   {
-    path: '/user/contact',
-    name: 'ContactAdmin',
-    component: () => import('../views/user/pages/ContactAdmin.vue'),
+    path: '/discussion',
+    name: 'Discussion Chat',
+    component: () => import('../views/DiscussionChat.vue'),
     meta: {
       requiresAuth: true
     }
@@ -95,8 +95,8 @@ const getCurrentUser = () => {
 router.beforeEach(async (to, from, next) => {
   if(to.path === '/' && auth.currentUser) {
     next('/user/dashboard')
-    if(auth.currentUser.email == adminEmail && user.uid == adminUid) {
-      next('/admin/dashboard')
+    if(auth.currentUser.email === adminEmail && auth.currentUser.uid === adminUid) {
+      router.push('/admin/dashboard')
     }
     return
   }
