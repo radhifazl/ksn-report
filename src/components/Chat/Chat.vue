@@ -24,7 +24,7 @@
                     <img :src="msg.photoURL">
                 </div>
                 <div class="chat-options-wrapper" v-if="msg.userUID == user.uid"> 
-                    <button class="option-btn" @click="deleteMessage(msg.userUID)">
+                    <button class="option-btn" @click="deleteMessage(msg.id)">
                         <i class='bx-fw bx bxs-trash'></i>
                     </button>
                 </div>
@@ -54,7 +54,7 @@
 import { db, auth } from "@/firebase"
 import {
     ref, push, set, serverTimestamp, onChildAdded,
-    remove, get, onChildRemoved
+    remove, get, onChildRemoved, onValue, child
 } from 'firebase/database'
 
 import Swal from "sweetalert2";
@@ -71,15 +71,17 @@ export default {
             msgSent: false,
             isScrolled: false,
             sender: false,
-            isClicked: false
+            isClicked: false,
         }
     },
     mounted() {
+        this.messages = []
         this.getMessages()
     },
     methods: {
         async sendMessage() {
             this.msgSent = true
+            const { v4: uuid } = require('uuid');
             try {
                 const msgRef = ref(db, 'messages')
                 const newmsgRef = push(msgRef)
@@ -91,6 +93,7 @@ export default {
                     createdAt: serverTimestamp(),
                     date: this.formatAMPM(new Date()),
                 }).then(() => {
+                    this.getMessages()
                     setTimeout(() => {
                         this.msgSent = false
                     }, 180000)
@@ -101,9 +104,54 @@ export default {
                 console.log("Error adding document: " + error.message)
             }
         },
+        // async sendMessage() {
+        //     this.msgSent = true
+        //     try {
+        //         const data = {
+        //             userUID: this.user.uid,
+        //             sender: this.user.displayName,
+        //             photoURL: this.user.photoURL,
+        //             text: this.msg,
+        //             createdAt: serverTimestamp(),
+        //             date: this.formatAMPM(new Date()),
+        //         }
+        //         await push(ref(db, 'messages'), data)
+        //             .then(() => {
+        //                 setTimeout(() => {
+        //                     this.msgSent = false
+        //                 }, 180000)
+        //             })
+        //     } catch(error) {
+        //         console.log("Error adding document: " + error.message)
+        //     }
+        //     this.msg = ''
+        // },
         getMessages() {
-            onChildAdded(ref(db, 'messages'), (snapshot) => {
-                this.messages.push(snapshot.val())
+            // onChildAdded(ref(db, 'messages'), (snapshot) => {
+            //     this.messages.push({
+            //         id: snapshot.key,
+            //         userUID: snapshot.val().userUID,
+            //         sender: snapshot.val().sender,
+            //         photoURL: snapshot.val().photoURL,
+            //         text: snapshot.val().text,
+            //         createdAt: snapshot.val().createdAt,
+            //         date: snapshot.val().date,
+            //     })
+            //     console.log(this.messages)
+            // })
+            onValue(ref(db, 'messages'), (snapshot) => {
+                this.messages = []
+                snapshot.forEach((childSnapshot) => {
+                    this.messages.push({
+                        id: childSnapshot.key,
+                        userUID: childSnapshot.val().userUID,
+                        sender: childSnapshot.val().sender,
+                        photoURL: childSnapshot.val().photoURL,
+                        text: childSnapshot.val().text,
+                        createdAt: childSnapshot.val().createdAt,
+                        date: childSnapshot.val().date,
+                    })
+                })
             })
         },
         deleteMessage(key) {
@@ -117,19 +165,7 @@ export default {
                 confirmButtonText: 'Ya, hapus pesan!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    get(ref(db, 'messages')).then(snapshot => {
-                        snapshot.forEach(doc => {
-                            if(doc.val().userUID == key) {
-                                remove(ref(db, 'messages', doc.key))
-                            }
-                        })
-                    }).then(() => {
-                        Swal.fire(
-                            'Deleted!',
-                            'Pesan berhasil dihapus.',
-                            'success'
-                        )
-                    })
+                    remove(ref(db, `message/${key}`))
                 }
             })
         },

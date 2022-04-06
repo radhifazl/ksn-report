@@ -75,11 +75,6 @@ const router = createRouter({
   routes
 })
 
-const user = auth.currentUser;
-const adminEmail = "radhifazlinurfahriza2gmail.com";
-const adminUid = "aJBM7W9ML5TPSMYEU6gD9xOFbYt1";
-
-
 const getCurrentUser = () => {
   return new Promise((resolve, reject) => {
     const removeListener = onAuthStateChanged(
@@ -95,9 +90,6 @@ const getCurrentUser = () => {
 router.beforeEach(async (to, from, next) => {
   if(to.path === '/' && auth.currentUser) {
     next('/user/dashboard')
-    if(auth.currentUser.email === adminEmail && auth.currentUser.uid === adminUid) {
-      router.push('/admin/dashboard')
-    }
     return
   }
 

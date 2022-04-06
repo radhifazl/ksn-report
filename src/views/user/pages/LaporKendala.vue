@@ -6,20 +6,19 @@
         <user-routes />
       </page-header>
 
-      <div class="lapor-header d-flex justify-content-between align-items-center p-4">
-          <h2 class="font-title mb-4" id="welcome-text">
+      <div class="lapor-header p-4">
+          <h2 class="font-title mb-1" id="welcome-text">
             Lapor Kendala
           </h2>
-
-          <h6 class="font-desc">{{tanggal}}</h6>
       </div>
 
       <div class="laporan-container p-4 pt-2">
         <div class="form-wrapper">
-          <form id="form-laporan">
-            <input type="hidden" name="uid" id="uid"> 
+          <form id="form-laporan" @submit.prevent="sendKendala">
+            <input type="hidden" name="uid" id="uid" v-model="formLaporan.uid"> 
             <div class="laporan-nama laporan-box">
-              <input type="text" 
+              <input type="text"
+               v-model="formLaporan.name" 
                name="name" 
                id="name" 
                placeholder="Nama" 
@@ -27,25 +26,28 @@
               >
             </div>
             <div class="laporan-team laporan-box">
-              <input type="text" 
+              <input type="text"
+               v-model="formLaporan.team"
                name="team" 
                id="team" 
                placeholder="Team" 
                autocomplete="off" 
-               value="Development Team" readonly
+               readonly
               >
             </div>
             <div class="laporan-email laporan-box">
-              <input type="email" 
+              <input type="email"
+               v-model="formLaporan.email"
                name="email" 
                id="email" 
                placeholder="Email" 
                autocomplete="off" 
-               :value="inpEmail" readonly
+               readonly
               >
             </div>
             <div class="laporan-nama-tugas laporan-box">
               <input type="text" 
+               v-model="formLaporan.namatugas"
                name="namatugas" 
                id="nama-tugas" 
                placeholder="Nama Tugas" 
@@ -53,7 +55,7 @@
               >
             </div>
             <div class="laporan-desc laporan-box">
-              <textarea name="desc" id="desc" placeholder="Jelaskan kendalamu disini"></textarea>
+              <textarea name="desc" id="desc" placeholder="Jelaskan kendalamu disini" v-model="formLaporan.desc"></textarea>
             </div>
 
             <div class="submitlaporan-button">
@@ -71,7 +73,9 @@
 <script>
 import PageHeader from '@/components//Header/PageHeader.vue'
 import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
-import { auth } from '@/firebase'
+import { auth, firestore } from '@/firebase'
+import { Toast } from "@/components/Toast";
+import { doc, collection, setDoc, addDoc } from "firebase/firestore";
 
 export default {
     name: 'LaporKendala',
@@ -80,21 +84,52 @@ export default {
     },
     data() {
       return {
-        tanggal: '',
-        inpEmail: ''
+        user: auth.currentUser,
+        formLaporan: {
+          name: '',
+          uid: auth.currentUser.uid,
+          team: 'Development Team',
+          email: auth.currentUser.email,
+          namatugas: '',
+          desc: ''
+        }
+
       }
     },
-    mounted() {
-      this.getDate()
-      this.getEmail()
+    created() {
+
     },
     methods: {
-      getDate() {
-        const now = new Date()
-        this.tanggal = now.toJSON().slice(0, 10).toString()
-      },
-      getEmail() {
-        this.inpEmail = auth.currentUser.email
+      async sendKendala() {
+        if(!this.formLaporan.name && !this.formLaporan.namatugas && !this.formLaporan.desc) {
+          Toast.fire({
+            title: 'Form kosong, mohon isi semua!',
+            icon: 'warning'
+          })
+        } else {
+          await addDoc(collection(firestore, 'kendala', this.user.displayName, this.user.displayName), {
+            name: this.formLaporan.name,
+            uid: this.formLaporan.uid,
+            team: this.formLaporan.team,
+            email: this.formLaporan.email,
+            namatugas: this.formLaporan.namatugas,
+            desc: this.formLaporan.desc
+          }).then(() => {
+            Toast.fire({
+              title: 'Laporan berhasil dikirim!',
+              icon: 'success',
+              showConfirmButton: true,
+              confirmButtonText: 'Dismiss',
+              showCloseButton: false,
+              timer: 3000,
+              timerProgressBar: true
+            })
+          })
+          
+          this.formLaporan.name = ''
+          this.formLaporan.namatugas = ''
+          this.formLaporan.desc = ''
+        }
       }
     }
 }
@@ -135,7 +170,7 @@ export default {
         background: $dark;
         color: $white;
         font-family: $second-font;
-        font-weight: 600;
+        font-weight: 400;
         padding: 0.8rem 0;
         font-size: 0.83rem;
         transition: 1s ease;

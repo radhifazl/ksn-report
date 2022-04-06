@@ -32,7 +32,15 @@ export default createStore({
         console.log(error.message)
       }
       commit('SET_USER', auth.currentUser)
-      router.push('/user/dashboard')
+
+      const adminEmail = "radhifazlinurfahriza@gmail.com";
+      const adminUid = "aJBM7W9ML5TPSMYEU6gD9xOFbYt1";
+      if(auth.currentUser.email == adminEmail && auth.currentUser.uid == adminUid) {
+        router.push('/admin/dashboard')
+        
+      } else {
+        router.push('/user/dashboard')
+      }
     },
     async logout({ commit }) {
       await signOut(auth)
