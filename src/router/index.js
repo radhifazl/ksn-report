@@ -15,13 +15,8 @@ const routes = [
     name: 'home',
     component: HomeView
   },
-  // {
-  //   path: '/signup',
-  //   name: 'signup',
-  //   component: SignupPage
-  // },
   {
-    path: '/user/dashboard',
+    path: '/user/:uid/dashboard',
     name: 'UserDashboard',
     component: () => import('../views/user/UserDashboard.vue'),
     meta: {
@@ -29,7 +24,7 @@ const routes = [
     }
   },
   {
-    path: '/admin/dashboard',
+    path: '/admin/:uid/dashboard',
     name: 'AdminDashboard',
     component: () => import('../views/admin/AdminDashboard.vue'),
     meta: {
@@ -37,7 +32,7 @@ const routes = [
     }
   },
   {
-    path: '/user/tugas',
+    path: '/user/:uid/tugas',
     name: 'usertugas',
     component: () => import('../views/user/pages/ProjectTugas.vue'),
     meta: {
@@ -45,7 +40,7 @@ const routes = [
     }
   },
   {
-    path: '/user/progress',
+    path: '/user/:uid/progress',
     name: 'LaporProgress',
     component: () => import('../views/user/pages/LaporProgress.vue'),
     meta: {
@@ -53,7 +48,7 @@ const routes = [
     }
   },
   {
-    path: '/user/kendala',
+    path: '/user/:uid/kendala',
     name: 'LaporKendala',
     component: () => import('../views/user/pages/LaporKendala.vue'),
     meta: {
@@ -88,8 +83,8 @@ const getCurrentUser = () => {
 }
 
 router.beforeEach(async (to, from, next) => {
-  if(to.path === '/' && auth.currentUser) {
-    next('/user/dashboard')
+  if(to.path === '/' && getCurrentUser()) {
+    next(`/user/${auth.currentUser.uid}/dashboard`)
     return
   }
 

@@ -48,7 +48,7 @@ export default {
       isActive: false
     }
   },
-  mounted() {
+  created() {
     this.getUser()
   },
   methods: {
@@ -134,7 +134,7 @@ export default {
           .nav-items {
             padding-left: 1rem;
             .nav-list {
-              margin-bottom: 3rem;
+              margin-bottom: 2.5rem;
               a {
                 color: $white;
                 font-family: $second-font;

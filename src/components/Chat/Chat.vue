@@ -53,11 +53,13 @@
 <script>
 import { db, auth } from "@/firebase"
 import {
-    ref, push, set, serverTimestamp, onChildAdded,
-    remove, get, onChildRemoved, onValue, child
+    ref, push, set, serverTimestamp, 
+    remove, onValue
 } from 'firebase/database'
 
 import Swal from "sweetalert2";
+import { deleteDoc } from '@firebase/firestore';
+import { v4 as uuid } from 'uuid'
 
 
 export default {
@@ -74,18 +76,18 @@ export default {
             isClicked: false,
         }
     },
-    mounted() {
-        this.messages = []
+    created() {
         this.getMessages()
     },
     methods: {
         async sendMessage() {
             this.msgSent = true
-            const { v4: uuid } = require('uuid');
+            const id = uuid();
             try {
                 const msgRef = ref(db, 'messages')
                 const newmsgRef = push(msgRef)
                 await set(newmsgRef, {
+                    id: id,
                     userUID: this.user.uid,
                     sender: this.user.displayName,
                     photoURL: this.user.photoURL,
@@ -98,48 +100,16 @@ export default {
                         this.msgSent = false
                     }, 180000)
                 })
+                const audio = new Audio(require('./notif.mp3'))
+                audio.play()
                 this.msg = ''
                 document.getElementById('scrollable').scrollIntoView({ behavior: 'smooth' })
             } catch(error) {
                 console.log("Error adding document: " + error.message)
             }
         },
-        // async sendMessage() {
-        //     this.msgSent = true
-        //     try {
-        //         const data = {
-        //             userUID: this.user.uid,
-        //             sender: this.user.displayName,
-        //             photoURL: this.user.photoURL,
-        //             text: this.msg,
-        //             createdAt: serverTimestamp(),
-        //             date: this.formatAMPM(new Date()),
-        //         }
-        //         await push(ref(db, 'messages'), data)
-        //             .then(() => {
-        //                 setTimeout(() => {
-        //                     this.msgSent = false
-        //                 }, 180000)
-        //             })
-        //     } catch(error) {
-        //         console.log("Error adding document: " + error.message)
-        //     }
-        //     this.msg = ''
-        // },
         getMessages() {
-            // onChildAdded(ref(db, 'messages'), (snapshot) => {
-            //     this.messages.push({
-            //         id: snapshot.key,
-            //         userUID: snapshot.val().userUID,
-            //         sender: snapshot.val().sender,
-            //         photoURL: snapshot.val().photoURL,
-            //         text: snapshot.val().text,
-            //         createdAt: snapshot.val().createdAt,
-            //         date: snapshot.val().date,
-            //     })
-            //     console.log(this.messages)
-            // })
-            onValue(ref(db, 'messages'), (snapshot) => {
+            onValue(ref(db, `messages`), (snapshot) => {
                 this.messages = []
                 snapshot.forEach((childSnapshot) => {
                     this.messages.push({
@@ -165,7 +135,14 @@ export default {
                 confirmButtonText: 'Ya, hapus pesan!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    remove(ref(db, `message/${key}`))
+                    remove(ref(db, 'messages/'+key))
+                    .then(() => {
+                        Swal.fire(
+                            'Dihapus!',
+                            'Pesan telah dihapus.',
+                            'success'
+                        )
+                    })
                 }
             })
         },
@@ -177,7 +154,9 @@ export default {
             hours = hours ? hours : 12
             minutes = minutes < 10 ? '0' + minutes : minutes
             let strTime = hours + ':' + minutes + ' ' + ampm
-            return strTime
+            const ddmmyyy = this.padTo2Digits(date.getDate()) + '/' + this.padTo2Digits(date.getMonth()+1) + '/' + date.getFullYear()
+            const now = ddmmyyy + ' ' + '--' +  ' ' + strTime
+            return now
         },
         popDelete() {
             if(!this.isClicked) {
@@ -185,6 +164,9 @@ export default {
             } else {
                 this.isClicked = false
             }
+        },
+        padTo2Digits(num) {
+            return num.toString().padStart(2, '0')
         }
     },
 }

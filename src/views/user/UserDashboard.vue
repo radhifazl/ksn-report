@@ -1,9 +1,9 @@
 <template>
   <div class="user-dashboard ccontainer d-flex">
       <div class="user-dash-content cwrap">
-          <page-header>
-            <user-routes />
-          </page-header>
+          <PageHeader>
+            <UserRoutes />
+          </PageHeader>
 
           <div class="dashboard-content p-4">
             <div class="welcome-text mb-4">
@@ -61,18 +61,18 @@
 
 <script>
 import PageHeader from '@/components/Header/PageHeader.vue'
+import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
 import { auth } from '@/firebase'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import "swiper/css"
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { Pagination, Navigation } from 'swiper'
-import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
 // import { useStore } from 'vuex'
 
 export default {
   name: 'UserDashboard',
-  components: { PageHeader, Swiper, SwiperSlide, UserRoutes },
+  components: { PageHeader, UserRoutes, Swiper, SwiperSlide },
   data() {
     return {
       username: "",

@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider, 
   signOut 
 } from 'firebase/auth'
+import { Toast } from "@/plugins/Toast";
 
 export default createStore({
   state: {
@@ -29,17 +30,61 @@ export default createStore({
       try {
         await signInWithPopup(auth, provider)
       } catch(error) {
-        console.log(error.message)
+        switch(error.code) {
+          case 'auth/account-exists-with-different-credential':
+            Toast.fire({
+              icon: 'error',
+              title: 'Email already in use with different credential',
+              timer: 3000,
+              showCancelButton: false,
+              timerProgressBar: true,
+            })
+            console.log('You have already signed up with a different auth provider for that email.');
+            break
+          case 'auth/cancelled-popup-request':
+            Toast.fire({
+              icon: 'error',
+              title: 'The popup has been closed',
+              timer: 3000,
+              showCancelButton: false,
+              timerProgressBar: true,
+            })
+            console.log('The popup has been closed.');
+            break
+          case 'auth/popup-blocked':
+            Toast.fire({
+              icon: 'error',
+              title: 'The popup was blocked by the browser',
+              timer: 3000,
+              showCancelButton: false,
+              timerProgressBar: true,
+            })
+            console.log('The popup was blocked by the browser.');
+            break
+          case 'auth/popup-closed-by-user':
+            Toast.fire({
+              icon: 'error',
+              title: 'The popup window was closed',
+              timer: 3000,
+              showCancelButton: false,
+              timerProgressBar: true,
+            })
+            this.dispatch('logout')
+            console.log('The popup window was closed.');
+            break
+          default:
+            console.log('An undefined error occurred.');
+        }
       }
       commit('SET_USER', auth.currentUser)
 
       const adminEmail = "radhifazlinurfahriza@gmail.com";
       const adminUid = "aJBM7W9ML5TPSMYEU6gD9xOFbYt1";
       if(auth.currentUser.email == adminEmail && auth.currentUser.uid == adminUid) {
-        router.push('/admin/dashboard')
+        router.push(`/admin/${adminUid}/dashboard`)
         
       } else {
-        router.push('/user/dashboard')
+        router.push(`/user/${auth.currentUser.uid}/dashboard`)
       }
     },
     async logout({ commit }) {

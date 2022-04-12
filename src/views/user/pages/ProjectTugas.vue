@@ -9,8 +9,6 @@
             <h2 class="font-title mb-4" id="welcome-text">
               Daftar Tugas :
             </h2>
-
-            <h6 class="font-desc">{{tanggal}}</h6>
           </div>
 
           <div class="daftar-tugas d-flex flex-wrap gap-4">
@@ -158,20 +156,6 @@ import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
 export default {
   components: { PageHeader, UserRoutes },
   name: 'UserTugas',
-  data() {
-    return {
-      tanggal: ''
-    }
-  },
-  mounted() {
-    this.getDate()
-  },
-  methods: {
-    getDate() {
-      const now = new Date()
-      this.tanggal = now.toJSON().slice(0, 10).toString()
-    }
-  }
 }
 </script>
 

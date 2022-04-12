@@ -1,12 +1,12 @@
 <template>
   <div class="discussion-chat ccontainer d-flex bg-lightgrey">
       <div class="discussion-wrapper w-100">
-          <page-header>
-              <user-routes />
-          </page-header>
+          <Page-header>
+              <User-routes />
+          </Page-header>
           <div class="discussion-content w-100">
               <div class="discussion-view container-fluid">
-                  <chat />
+                  <Chat />
               </div>
           </div>
       </div>

@@ -1,28 +1,26 @@
 <template>
-  <div class="lapor-progress-wrapper ccontainer d-flex">
-    <div class="lapor-progress cwrap">
-      <page-header>
-        <user-routes />
-      </page-header>
+  <div class="lapor-progress-wrapper d-flex">
+    <div class="lapor-progress" style="height: 100vh">
+      <PageHeader>
+        <UserRoutes />
+      </PageHeader>
 
       <div class="lapor-header d-flex justify-content-between align-items-center p-4">
           <h2 class="font-title mb-4" id="welcome-text">
             Lapor Progress
           </h2>
-
-          <h6 class="font-desc">{{tanggal}}</h6>
       </div>
 
       <div class="laporan-container p-4 pt-2">
         <div class="form-wrapper">
-          <form id="form-laporan">
-            <input type="hidden" name="uid" id="uid"> 
+          <form id="form-laporan" @submit.prevent="sendProgress">
+            <input type="hidden" name="uid" id="uid" v-model="user.uid"> 
             <div class="laporan-nama laporan-box">
               <input type="text" 
                name="name" 
                id="name" 
                placeholder="Nama" 
-               autocomplete="off"
+               autocomplete="off" v-model="formLaporan.name"
               >
             </div>
             <div class="laporan-team laporan-box">
@@ -31,7 +29,7 @@
                id="team" 
                placeholder="Team" 
                autocomplete="off" 
-               value="Development Team" readonly
+              readonly v-model="formLaporan.team"
               >
             </div>
             <div class="laporan-email laporan-box">
@@ -40,7 +38,7 @@
                id="email" 
                placeholder="Email" 
                autocomplete="off" 
-               :value="inpEmail" readonly
+               readonly v-model="formLaporan.email"
               >
             </div>
             <div class="laporan-nama-tugas laporan-box">
@@ -48,7 +46,7 @@
                name="namatugas" 
                id="nama-tugas" 
                placeholder="Nama Tugas" 
-               autocomplete="off"
+               autocomplete="off" v-model="formLaporan.namatugas"
               >
             </div>
             <div class="laporan-gitlablink laporan-box">
@@ -56,15 +54,11 @@
                name="gitlablink" 
                id="gitlab-link" 
                placeholder="Link Project (GitLab)" 
-               autocomplete="off"
+               autocomplete="off" v-model="formLaporan.gitlablink"
               >
             </div>
 
-            <div class="submitlaporan-button">
-              <button type="submit" class="submitlaporan-btn">
-                <i class='bx-fw bx bxs-send'></i> Submit Laporan
-              </button>
-            </div>
+            <SubmitButton />
           </form>
         </div>
       </div>
@@ -73,32 +67,98 @@
 </template>
 
 <script>
-import PageHeader from '@/components//Header/PageHeader.vue'
+import PageHeader from '@/components/Header/PageHeader.vue'
 import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
-import { auth } from '@/firebase'
+import { auth, firestore } from '@/firebase'
+import { Toast } from "@/plugins/Toast"
+import { uuid } from "@/plugins/Uuid"
+import Swal from 'sweetalert2'
+import {
+  addDoc, deleteDoc, collection, doc
+} from "firebase/firestore"
+import SubmitButton from '@/components/Buttons/SubmitButton.vue';
 
 export default {
     name: 'LaporProgress',
     components: {
-      PageHeader, UserRoutes
+      PageHeader, UserRoutes, SubmitButton
     },
     data() {
       return {
-        tanggal: '',
-        inpEmail: ''
+        user: auth.currentUser,
+        formLaporan: {
+          name: '',
+          team: 'Development Team',
+          email: auth.currentUser.email,
+          uid: auth.currentUser.uid,
+          namatugas: '',
+          gitlablink: ''
+        }
       }
     },
-    mounted() {
-      this.getDate()
-      this.getEmail()
-    },
     methods: {
-      getDate() {
-        const now = new Date()
-        this.tanggal = now.toJSON().slice(0, 10).toString()
+      async sendProgress() {
+        if(!this.formLaporan.name && !this.formLaporan.namatugas && !this.formLaporan.gitlablink) {
+          Toast.fire({
+            icon: 'error',
+            title: 'Mohon lengkapi form progress dengan benar!',
+          })
+        } else {
+          await addDoc(collection(firestore, 'progress', this.user.displayName, this.user.displayName), {
+            id: uuid(),
+            name: this.formLaporan.name,
+            team: this.formLaporan.team,
+            email: this.formLaporan.email,
+            namatugas: this.formLaporan.namatugas,
+            gitlablink: this.formLaporan.gitlablink
+          }).then(() => {
+            Toast.fire({
+              title: 'Laporan berhasil dikirim!',
+              icon: 'success',
+              showConfirmButton: true,
+              confirmButtonText: 'Dismiss',
+              showCloseButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+            })
+          }).catch(() => {
+            Toast.fire({
+              title: 'Gagal',
+              text: 'Laporan gagal dikirim, silahkan coba lagi!',
+              icon: 'error',
+              showConfirmButton: true,
+              confirmButtonText: 'Dismiss',
+              showCloseButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+            })
+          })
+          this.formLaporan.name = ''
+          this.formLaporan.namatugas = ''
+          this.formLaporan.gitlablink = ''
+        }
       },
-      getEmail() {
-        this.inpEmail = auth.currentUser.email
+      deleteReport(id) {
+        Swal.fire({
+          title: 'Hapus laporan?',
+          text: "Laporan akan dihapus secara permanen!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            deleteDoc(doc(firestore, 'progress', this.user.displayName, this.user.displayName, id))
+            .then(() => {
+              Swal.fire(
+                'Terhapus!',
+                'Laporan berhasil dihapus.',
+                'success'
+              )
+            })
+          }
+        })
       }
     }
 }
@@ -109,6 +169,11 @@ export default {
 
 .lapor-progress-wrapper {
   background-color: rgb(241, 241, 241);
+}
+
+.lapor-progress {
+  width: 100%;
+  height: 100%;
 }
 
 .laporan-container {
@@ -131,35 +196,6 @@ export default {
         padding: 0.5rem;
         font-size: 0.83rem;
         font-family: $second-font;
-      }
-    }
-
-    .submitlaporan-button {
-      .submitlaporan-btn {
-        border: none;
-        border-radius: 5px;
-        background: $dark;
-        color: $white;
-        font-family: $second-font;
-        font-weight: 600;
-        padding: 0.8rem 0;
-        font-size: 0.83rem;
-        transition: 1s ease;
-
-        /* &:hover i {
-          animation: moveright 1s ease infinite;
-          transition: 1s ease;
-        } */
-
-        /* @keyframes moveright {
-          0%, 100% {
-            transform: translateX(0);
-          }
-
-          50% {
-            transform: translateX(-1rem);
-          }
-        } */
       }
     }
   }
