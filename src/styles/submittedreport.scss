@@ -1,0 +1,81 @@
+@import "@/styles/base.scss";
+.submitted-report-wrapper {
+    width: 100%;
+    overflow-x: hidden;
+    height: fit-content;
+    background-color: rgb(241, 241, 241);
+    .wrapper-title {
+      .see-report-btn {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-family: $first-font;
+      }
+    }
+
+    .report-wrapper {
+      box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+      padding: 0.8rem;
+      width: 50%;
+      position: relative;
+      .report-item {
+        .item-box {
+          display: flex;
+          width: 100%;
+          height: fit-content;
+          margin-bottom: 1rem;
+          .label {
+            width: 200px;
+            position: relative;
+
+            i {
+              font-size: 0.436rem;
+            }
+
+            &::after {
+              content: ':';
+              position: absolute;
+              right: 5%;
+              top: 0;
+              font-weight: bold;
+            }
+          }
+          .label.label-kendala {
+            width: 200px;
+          }
+          p {
+            width: 60%;
+            border-bottom: 1px solid #888;
+          }
+        }
+        
+      }
+    }
+}
+@media screen and (max-width: 768px) {
+    .submitted-report-wrapper {
+        width: 100%;
+        .wrapper-title {
+          .see-report-btn {
+            h5 {
+              font-size: 1.2rem;
+              text-align: left;
+              padding-left: 0.5rem;
+            }
+          }
+        }
+  
+        .report-wrapper {
+          .report-item {
+            .item-box {
+              flex-direction: column;
+              p {
+                width: 100%;
+              padding-left: 0.8rem;
+              }
+  
+            }
+          }
+        }
+    }
+}

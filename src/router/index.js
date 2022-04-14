@@ -83,7 +83,7 @@ const getCurrentUser = () => {
 }
 
 router.beforeEach(async (to, from, next) => {
-  if(to.path === '/' && getCurrentUser()) {
+  if(to.path === '/' && getCurrentUser() && auth.currentUser) {
     next(`/user/${auth.currentUser.uid}/dashboard`)
     return
   }

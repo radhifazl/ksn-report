@@ -6,14 +6,14 @@
         <UserRoutes />
       </PageHeader>
 
-      <div class="lapor-header p-4">
-          <h2 class="font-title mb-1" id="welcome-text">
+      <div class="lapor-header text-center p-4">
+          <h2 class="font-title mb-2 mt-3" id="welcome-text">
             Lapor Kendala
           </h2>
       </div>
 
-      <div class="laporan-container p-4 pt-2 d-flex justify-content-between align-items-start w-100 gap-5 flex-lg-row flex-column">
-        <div class="form-wrapper">
+      <div class="laporan-container p-4 pt-2">
+        <div class="form-wrapper mx-auto">
           <form id="form-laporan" @submit.prevent="sendKendala">
             <input type="hidden" name="uid" id="uid" v-model="formLaporan.uid"> 
             <div class="laporan-nama laporan-box">
@@ -21,7 +21,7 @@
                v-model="formLaporan.name" 
                name="name" 
                id="name" 
-               placeholder="Nama" 
+               placeholder="Nama Lengkap" 
                autocomplete="off" minlength="10" maxlength="50"
               >
             </div>
@@ -50,57 +50,100 @@
                v-model="formLaporan.namatugas"
                name="namatugas" 
                id="nama-tugas" 
-               placeholder="Nama Tugas" 
+               placeholder="Nama Tugas / Project" 
                autocomplete="off" minlength="10" maxlength="50"
               >
             </div>
             <div class="laporan-desc laporan-box">
               <textarea name="desc" id="desc" placeholder="Jelaskan kendalamu disini" v-model="formLaporan.desc" minlength="50"></textarea>
             </div>
-
-            <SubmitButton/>
+            
+            <SubmitButton>
+              <button type="submit" class="submitlaporan-btn">
+                <div class="loading" v-if="loading">
+                  <i class='bx-fw bx bxs-send bx-fade-left' ></i> <span>Mengirim...</span>
+                </div>
+                <div class="send-text" v-else>
+                  <i class='bx-fw bx bxs-send'></i> Submit Laporan
+                </div>
+              </button>
+              <span v-if="isKendalaSent">*Lihat laporan terakhir yang kamu kirim di bawah.</span>
+            </SubmitButton>
           </form>
         </div>
-
-        <div class="submitted-report-wrapper" v-if="isKendalaSent">
+      </div>
+      
+      <div class="submitted-report-wrapper mt-3 p-4" v-if="isKendalaSent">
           <div class="wrapper-title mb-3">
-            <button class="see-report-btn d-flex align-items-center" @click="getLastReport">
+            <button class="see-report-btn mx-auto d-flex align-items-center" @click="getLastReport" :disabled="isDsabled">
               <i class='bx-fw bx bxs-chevron-right'></i> 
               <h5>Lihat Laporan Yang Sudah Dikirim</h5>
             </button>
           </div>
-
-          <div class="report-wrapper w-100" v-if="lastReport.length > 0">
+          <div class="report-wrapper mx-auto" v-if="lastReport.length > 0">
             <div class="report-item" v-for="(report, i) in lastReport" :key="i">
-              <div class="item-box box-nama">
-                <h6 class="label label-nama"><i class='bx-fw bx bxs-circle'></i> Nama</h6>
-                <p>{{ report.name }}</p>
+              <div class="submitted-wrapper">
+                <div class="item-box box-nama">
+                  <h6 class="label label-nama"><i class='bx-fw bx bxs-circle'></i>Nama Lengkap</h6>
+                  <p>{{ report.name }}</p>
+                </div>
+                <div class="item-box box-team">
+                  <h6 class="label label-team"><i class='bx-fw bx bxs-circle'></i>Nama Team</h6>
+                  <p>{{ report.team }}</p>
+                </div>
+                <div class="item-box box-email">
+                  <h6 class="label label-email"><i class='bx-fw bx bxs-circle'></i>Email</h6>
+                  <p>{{ report.email }}</p>
+                </div>
+                <div class="item-box box-tugas">
+                  <h6 class="label label-tugas"><i class='bx-fw bx bxs-circle'></i>Nama Tugas</h6>
+                  <p>{{ report.namatugas }}</p>
+                </div>
+                <div class="item-box box-kendala">
+                    <h6 class="label label-kendala"><i class='bx-fw bx bxs-circle'></i>Kendala</h6>
+                    <p class="desc-paragraph">{{ report.desc }}</p>
+                </div>
               </div>
-              <div class="item-box box-team">
-                <h6 class="label label-team"><i class='bx-fw bx bxs-circle'></i> Team</h6>
-                <p>{{ report.team }}</p>
-              </div>
-              <div class="item-box box-email">
-                <h6 class="label label-email"><i class='bx-fw bx bxs-circle'></i> Email</h6>
-                <p>{{ report.email }}</p>
-              </div>
-              <div class="item-box box-tugas">
-                <h6 class="label label-tugas"><i class='bx-fw bx bxs-circle'></i> Tugas</h6>
-                <p>{{ report.namatugas }}</p>
-              </div>
-              <div class="item-box box-kendala flex-column">
-                <h6 class="label label-kendala"><i class='bx-fw bx bxs-circle'></i> Kendala</h6>
-                <p class="desc-paragraph">{{ report.desc }}</p>
+              
+              <div class="option-btn-wrapper d-flex align-items-center gap-3">
+                <DeleteButton @deleteReport="deleteReport(report.id)"/>
+                <UpdateButton @editReport="popEditForm = true"/>
               </div>
 
-              <div class="delete-report">
-                <button class="delete-report-btn btn btn-danger" @click="deleteReport(report.id)">
-                  <i class='bx-fw bx bxs-trash'></i> Hapus Laporan
-                </button>
+              <div class="update-form-wrapper w-100" v-if="popEditForm">
+                <form id="edit-form" class="p-4" @submit.prevent="editReport(report.id)">
+                  <div class="form-title d-flex align-items-center justify-content-center">
+                    <i class='bx-fw bx bxs-edit'></i>
+                    <h5>Update Laporan</h5>
+                  </div>
+                  <div class="note mb-3">
+                    <p class="text-center font-desc-2" style="font-style: italic; font-size: 0.838rem;">Note: Nama team dan email tidak dapat dirubah</p>
+                  </div>
+                  <div class="update update-name">
+                    <label for="editnama">Nama Lengkap</label>
+                      <input type="text" id="editnama" name="editnama" autocomplete="off" v-model="updateForm.updateNama">
+                  </div>
+
+                  <div class="update update-namatugas">
+                    <label for="editnamatugas">Nama Tugas</label>
+                      <input type="text" id="editnamatugas" name="editnamatugas" autocomplete="off" v-model="updateForm.updateNamatugas">
+                  </div>
+
+                  <div class="update update-desc">
+                    <label for="editdesc">Deskripsi Kendala</label>
+                      <textarea id="editdesc" name="editdesc" autocomplete="off" v-model="updateForm.updateDesc"></textarea>
+                  </div>
+
+                  <button type="submit" class="update-btn">
+                    <i class='bx-fw bx bxs-edit'></i> Update Laporan
+                  </button>
+                  <button class="update-btn" @click="popEditForm = false">
+                    Batalkan
+                  </button>
+                </form>
               </div>
             </div>
           </div>
-        </div>
       </div>
     </div>
   </div>
@@ -113,16 +156,19 @@ import { auth, firestore } from '@/firebase'
 import { Toast } from "@/plugins/Toast";
 import { uuid } from "@/plugins/Uuid";
 import { 
-  doc, collection, setDoc, 
+  doc, collection, setDoc, updateDoc,
   addDoc, getDoc, getDocs, deleteDoc
 } from "firebase/firestore";
 import Swal from "sweetalert2";
 import SubmitButton from "@/components/Buttons/SubmitButton.vue";
+import DeleteButton from "@/components/Buttons/DeleteButton.vue";
+import UpdateButton from '@/components/Buttons/UpdateButton.vue';
 
 export default {
     name: 'LaporKendala',
     components: {
-      PageHeader, UserRoutes, SubmitButton
+      PageHeader, UserRoutes, 
+      SubmitButton, DeleteButton, UpdateButton
     },
     data() {
       return {
@@ -137,17 +183,26 @@ export default {
         },
         isKendalaSent: false,
         kendalaUser: [],
-        lastReport: []
+        lastReport: [],
+        loading: false,
+        isDisabled: false,
+        popEditForm: false,
+        updateForm: { 
+          updateNama: '',
+          updateNamatugas: '',
+          updateDesc: ''
+        },
       }
     },
     methods: {
       async sendKendala() {
-        if(!this.formLaporan.name && !this.formLaporan.namatugas && !this.formLaporan.desc) {
+        if(!this.formLaporan.name || !this.formLaporan.namatugas || !this.formLaporan.desc) {
           Toast.fire({
             title: 'Form kosong, mohon isi semua!',
             icon: 'warning'
           })
         } else {
+          this.loading = true
           await addDoc(collection(firestore, 'kendala', this.user.displayName, this.user.displayName), {
             id: uuid(),
             name: this.formLaporan.name,
@@ -165,6 +220,7 @@ export default {
               showCloseButton: false,
             })
             this.isKendalaSent = true
+            this.loading = false
             setTimeout(() => {
               this.isKendalaSent = false
             }, 300000)
@@ -185,6 +241,7 @@ export default {
         }
       },
       async getLastReport() {
+        this.isDisabled = true
         const docSnap = await getDocs(collection(firestore, 'kendala', this.user.displayName, this.user.displayName))
         docSnap.forEach(doc => {
           this.kendalaUser.push({...doc.data(), id: doc.id})
@@ -217,6 +274,42 @@ export default {
         }).catch(err => {
           console.log(err)
         })
+      },
+      editReport(id) {
+        if(!this.updateForm.updateNama || !this.updateForm.updateNamatugas || !this.updateForm.updateDesc) {
+          Swal.fire({
+            title: 'Form kosong, mohon isi semua!',
+            icon: 'warning',
+            showConfirmButton: true,
+            confirmButtonText: 'Oke',
+          })
+        } else {
+          updateDoc(doc(firestore, 'kendala', this.user.displayName, this.user.displayName, id), {
+            name: this.updateForm.updateNama,
+            namatugas: this.updateForm.updateNamatugas,
+            desc: this.updateForm.updateDesc
+          }).then(() => {
+            Toast.fire({
+              title: 'Laporan berhasil diperbarui!',
+              icon: 'success',
+              showConfirmButton: true,
+              confirmButtonText: 'Dismiss',
+              showCloseButton: false,
+            })
+            this.popEditForm = false
+            this.getLastReport()
+          }).catch(err => {
+            Toast.fire({
+              title: 'Terjadi kesalahan, mohon coba lagi!',
+              text: err.message,
+              icon: 'error',
+              showConfirmButton: true,
+              confirmButtonText: 'Dismiss',
+              showCloseButton: false,
+            })
+          })
+        }
+
       }
     },
 }
@@ -224,6 +317,8 @@ export default {
 
 <style lang="scss">
 @import "@/styles/base.scss";
+@import "@/styles/submittedreport.scss";
+@import "@/styles/updateform.scss";
 
 .lapor-progress-wrapper {
   background-color: rgb(241, 241, 241);
@@ -256,54 +351,11 @@ export default {
         height: 100px;
         resize: none;
       }
+
     }
   }
 
-  .submitted-report-wrapper {
-    width: 50%;
-    overflow-x: hidden;
-    .wrapper-title {
-      .see-report-btn {
-        border: none;
-        outline: none;
-        background: transparent;
-        font-family: $first-font;
-      }
-    }
-
-    .report-wrapper {
-      box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-      padding: 0.8rem;
-      .report-item {
-        .item-box {
-          display: flex;
-          margin-bottom: 1rem;
-          .label {
-            width: 40%;
-            position: relative;
-
-            i {
-              font-size: 0.436rem;
-            }
-
-            &::after {
-              content: ':';
-              position: absolute;
-              right: 5%;
-              top: 0;
-              font-weight: bold;
-            }
-          }
-          p {
-            width: 60%;
-            border-bottom: 1px solid #888;
-          }
-        }
-      }
-    }
-  }
 }
-
 
 @media screen and (max-width: 768px) {
   .laporan-container {
@@ -316,31 +368,6 @@ export default {
       }
     }
 
-    .submitted-report-wrapper {
-      width: 100%;
-      .wrapper-title {
-        .see-report-btn {
-          h5 {
-            font-size: 1.2rem;
-            text-align: left;
-            padding-left: 0.5rem;
-          }
-        }
-      }
-
-      .report-wrapper {
-        .report-item {
-          .item-box {
-            flex-direction: column;
-            p {
-              width: 100%;
-            padding-left: 0.8rem;
-            }
-
-          }
-        }
-      }
-    }
   }
 }
 
@@ -358,23 +385,8 @@ export default {
         }
       }
     }
-    .submitted-report-wrapper {
-      .report-wrapper {
-        .report-item {
-          .item-box {
-            p {
-              width: 60%;
-            }
-
-            p.desc-paragraph {
-              width: 100%;
-              height: fit-content;
-              padding-left: 0.7rem;
-            }
-          }
-        }
-      }
-    }
   }
 }
+
+
 </style>

@@ -5,21 +5,21 @@
         <UserRoutes />
       </PageHeader>
 
-      <div class="lapor-header d-flex justify-content-between align-items-center p-4">
-          <h2 class="font-title mb-4" id="welcome-text">
+      <div class="lapor-header text-center p-4">
+          <h2 class="font-title mb-2 mt-3" id="welcome-text">
             Lapor Progress
           </h2>
       </div>
 
       <div class="laporan-container p-4 pt-2">
-        <div class="form-wrapper">
+        <div class="form-wrapper mx-auto">
           <form id="form-laporan" @submit.prevent="sendProgress">
             <input type="hidden" name="uid" id="uid" v-model="user.uid"> 
             <div class="laporan-nama laporan-box">
               <input type="text" 
                name="name" 
                id="name" 
-               placeholder="Nama" 
+               placeholder="Nama Lengkap" minlength="10"
                autocomplete="off" v-model="formLaporan.name"
               >
             </div>
@@ -45,7 +45,7 @@
               <input type="text" 
                name="namatugas" 
                id="nama-tugas" 
-               placeholder="Nama Tugas" 
+               placeholder="Nama Tugas" minlength="10"
                autocomplete="off" v-model="formLaporan.namatugas"
               >
             </div>
@@ -53,14 +53,98 @@
               <input type="text" 
                name="gitlablink" 
                id="gitlab-link" 
-               placeholder="Link Project (GitLab)" 
+               placeholder="Link Project (GitLab)" minlength="14"
                autocomplete="off" v-model="formLaporan.gitlablink"
+               pattern="https?://gitlab.+" title="Include https://gitlab"
               >
             </div>
 
-            <SubmitButton />
+            <SubmitButton>
+              <button type="submit" class="submitlaporan-btn">
+                <div class="loading" v-if="loading">
+                  <i class='bx-fw bx bxs-send bx-fade-left' ></i> <span>Mengirim...</span>
+                </div>
+                <div class="send-text" v-else>
+                  <i class='bx-fw bx bxs-send'></i> Submit Laporan
+                </div>
+              </button>
+              <span v-if="isKendalaSent">*Lihat laporan terakhir yang kamu kirim di bawah.</span>
+            </SubmitButton>
           </form>
         </div>
+      </div>
+      <div class="submitted-report-wrapper mt-3 p-4" v-if="isKendalaSent">
+          <div class="wrapper-title mb-3">
+            <button class="see-report-btn mx-auto d-flex align-items-center mx-auto" @click="getLastReport" :disabled="isDisabled">
+              <i class='bx-fw bx bxs-chevron-right'></i> 
+              <h5>Lihat Laporan Yang Sudah Dikirim</h5>
+            </button>
+          </div>
+          <div class="report-wrapper mx-auto" v-if="lastReport.length > 0">
+            <div class="report-item" v-for="(report, i) in lastReport" :key="i">
+              <div class="submitted-wrapper">
+                <div class="item-box box-nama">
+                  <h6 class="label label-nama"><i class='bx-fw bx bxs-circle'></i> Nama Lengkap</h6>
+                  <p>{{ report.name }}</p>
+                </div>
+                <div class="item-box box-team">
+                  <h6 class="label label-team"><i class='bx-fw bx bxs-circle'></i> Nama Team</h6>
+                  <p>{{ report.team }}</p>
+                </div>
+                <div class="item-box box-email">
+                  <h6 class="label label-email"><i class='bx-fw bx bxs-circle'></i> Email</h6>
+                  <p>{{ report.email }}</p>
+                </div>
+                <div class="item-box box-tugas">
+                  <h6 class="label label-tugas"><i class='bx-fw bx bxs-circle'></i>Nama Tugas</h6>
+                  <p>{{ report.namatugas }}</p>
+                </div>
+                <div class="item-box box-gitlab flex-column">
+                  <h6 class="label label-kendala"><i class='bx-fw bx bxs-circle'></i>Gitlab Link</h6>
+                  <p class="desc-paragraph">{{ report.gitlablink }}</p>
+                </div>
+              </div>
+
+              <div class="option-btn-wrapper d-flex align-items-center gap-3">
+                <DeleteButton @deleteReport="deleteReport(report.id)"/>
+                <UpdateButton @editReport="popEditForm = true"/>
+              </div>
+
+
+              <div class="update-form-wrapper w-100" v-if="popEditForm">
+                <form id="edit-form" class="p-4" @submit.prevent="editReport(report.id)">
+                  <div class="form-title d-flex align-items-center justify-content-center">
+                    <i class='bx-fw bx bxs-edit'></i>
+                    <h5>Update Laporan</h5>
+                  </div>
+                  <div class="note mb-3">
+                    <p class="text-center font-desc-2" style="font-style: italic; font-size: 0.838rem;">Note: Nama team dan email tidak dapat dirubah</p>
+                  </div>
+                  <div class="update update-name">
+                    <label for="editnama">Nama Lengkap</label>
+                      <input type="text" id="editnama" name="editnama" autocomplete="off" v-model="updateForm.updateNama">
+                  </div>
+
+                  <div class="update update-namatugas">
+                    <label for="editnamatugas">Nama Tugas</label>
+                      <input type="text" id="editnamatugas" name="editnamatugas" autocomplete="off" v-model="updateForm.updateNamatugas">
+                  </div>
+
+                  <div class="update update-desc">
+                    <label for="editgitlab">Deskripsi Kendala</label>
+                    <input type="text" id="editgitlab" name="editgitlab" autocomplete="off" v-model="updateForm.updateLink">
+                  </div>
+
+                  <button type="submit" class="update-btn">
+                    <i class='bx-fw bx bxs-edit'></i> Update Laporan
+                  </button>
+                  <button class="update-btn" @click="popEditForm = false">
+                    Batalkan
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
       </div>
     </div>
   </div>
@@ -74,14 +158,16 @@ import { Toast } from "@/plugins/Toast"
 import { uuid } from "@/plugins/Uuid"
 import Swal from 'sweetalert2'
 import {
-  addDoc, deleteDoc, collection, doc
+  addDoc, deleteDoc, collection, doc, getDocs, updateDoc
 } from "firebase/firestore"
 import SubmitButton from '@/components/Buttons/SubmitButton.vue';
+import DeleteButton from '@/components/Buttons/DeleteButton.vue';
+import UpdateButton from '@/components/Buttons/UpdateButton.vue';
 
 export default {
     name: 'LaporProgress',
     components: {
-      PageHeader, UserRoutes, SubmitButton
+      PageHeader, UserRoutes, SubmitButton, DeleteButton, UpdateButton
     },
     data() {
       return {
@@ -93,17 +179,30 @@ export default {
           uid: auth.currentUser.uid,
           namatugas: '',
           gitlablink: ''
-        }
+        },
+        isKendalaSent: false,
+        loading: false,
+        progressUser: [],
+        lastReport: [],
+        isDisabled: false,
+        updateForm: {
+          updateNama: '',
+          updateNamatugas: '',
+          updateLink: ''
+        },
+        popEditForm: false
       }
     },
     methods: {
       async sendProgress() {
-        if(!this.formLaporan.name && !this.formLaporan.namatugas && !this.formLaporan.gitlablink) {
+        let pattern = /https:\/\/gitlab\.com\//i;
+        if(!this.formLaporan.name || !this.formLaporan.namatugas || !this.formLaporan.gitlablink) {
           Toast.fire({
             icon: 'error',
             title: 'Mohon lengkapi form progress dengan benar!',
           })
         } else {
+          this.loading = true
           await addDoc(collection(firestore, 'progress', this.user.displayName, this.user.displayName), {
             id: uuid(),
             name: this.formLaporan.name,
@@ -121,6 +220,11 @@ export default {
               timer: 2000,
               timerProgressBar: true,
             })
+            this.loading = false
+            this.isKendalaSent = true
+            setTimeout(() => {
+              this.isKendalaSent = false
+            }, 300000)
           }).catch(() => {
             Toast.fire({
               title: 'Gagal',
@@ -136,6 +240,18 @@ export default {
           this.formLaporan.name = ''
           this.formLaporan.namatugas = ''
           this.formLaporan.gitlablink = ''
+        }
+      },
+      async getLastReport() {
+        this.isDisabled = true
+        const docSnap = await getDocs(collection(firestore, 'progress', this.user.displayName, this.user.displayName))
+        docSnap.forEach(doc => {
+          this.progressUser.push({...doc.data(), id: doc.id})
+        })
+        if(this.progressUser.length >= 1) {
+          this.lastReport.push(this.progressUser[0])
+        } else {
+          this.lastReport = []
         }
       },
       deleteReport(id) {
@@ -156,9 +272,45 @@ export default {
                 'Laporan berhasil dihapus.',
                 'success'
               )
+              this.isKendalaSent = false
             })
           }
         })
+      },
+      editReport(id) {
+        if(!this.updateForm.updateNama || !this.updateForm.updateNamatugas || !this.updateForm.updateLink) {
+          Swal.fire({
+            title: 'Form kosong, mohon isi semua!',
+            icon: 'warning',
+            showConfirmButton: true,
+            confirmButtonText: 'Oke',
+          })
+        } else {
+          updateDoc(doc(firestore, 'kendala', this.user.displayName, this.user.displayName, id), {
+            name: this.updateForm.updateNama,
+            namatugas: this.updateForm.updateNamatugas,
+            gitlablink: this.updateForm.updateLink
+          }).then(() => {
+            Toast.fire({
+              title: 'Laporan berhasil diperbarui!',
+              icon: 'success',
+              showConfirmButton: true,
+              confirmButtonText: 'Dismiss',
+              showCloseButton: false,
+            })
+            this.popEditForm = false
+          }).catch(err => {
+            Toast.fire({
+              title: 'Terjadi kesalahan, mohon coba lagi!',
+              text: err.message,
+              icon: 'error',
+              showConfirmButton: true,
+              confirmButtonText: 'Dismiss',
+              showCloseButton: false,
+            })
+          })
+        }
+
       }
     }
 }
@@ -166,6 +318,7 @@ export default {
 
 <style lang="scss">
 @import "@/styles/base.scss";
+@import "@/styles/submittedreport.scss";
 
 .lapor-progress-wrapper {
   background-color: rgb(241, 241, 241);

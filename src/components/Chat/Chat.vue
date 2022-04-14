@@ -93,7 +93,7 @@ export default {
                     photoURL: this.user.photoURL,
                     text: this.msg,
                     createdAt: serverTimestamp(),
-                    date: this.formatAMPM(new Date()),
+                    date: this.getDate(new Date()),
                 }).then(() => {
                     this.getMessages()
                     setTimeout(() => {
@@ -146,7 +146,7 @@ export default {
                 }
             })
         },
-        formatAMPM(date) {
+        getDate(date) {
             let hours = date.getHours()
             let minutes = date.getMinutes()
             let ampm = hours >= 12 ? 'pm' : 'am'

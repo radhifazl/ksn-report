@@ -49,13 +49,10 @@ export default {
     }
   },
   created() {
-    this.getUser()
+    this.username = this.user.displayName
+    this.profile = this.user.photoURL
   },
   methods: {
-    getUser() {
-      this.username = this.user.displayName
-      this.profile = this.user.photoURL
-    },
     openMenu() {
       if(!this.isActive) {
         this.isActive = true

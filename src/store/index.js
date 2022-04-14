@@ -81,7 +81,7 @@ export default createStore({
       const adminEmail = "radhifazlinurfahriza@gmail.com";
       const adminUid = "aJBM7W9ML5TPSMYEU6gD9xOFbYt1";
       if(auth.currentUser.email == adminEmail && auth.currentUser.uid == adminUid) {
-        router.push(`/admin/${adminUid}/dashboard`)
+        router.push(`/admin/${auth.currentUser.uid}/dashboard`)
         
       } else {
         router.push(`/user/${auth.currentUser.uid}/dashboard`)

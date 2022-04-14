@@ -1,8 +1,6 @@
 <template>
-  <div class="submitlaporan-button">
-    <button type="submit" class="submitlaporan-btn">
-      <i class='bx-fw bx bxs-send'></i> Submit Laporan
-    </button>
+  <div class="submitlaporan-button d-flex justify-content-between align-items-center">
+    <slot/>
    </div>
 </template>
 
@@ -24,7 +22,17 @@ export default {
       font-weight: 400;
       padding: 0.8rem 0;
       font-size: 0.83rem;
-      transition: 1s ease;
+      transition: 0.35s ease;
+
+      &:hover {
+        background: #353244;
+        color: $white;
+      }
+    }
+
+    span {
+      color: #888;
+      font-family: $third-font;
     }
   }
 </style>

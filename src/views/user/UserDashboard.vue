@@ -8,51 +8,7 @@
           <div class="dashboard-content p-4">
             <div class="welcome-text mb-4">
               <h1 class="font-title">Halo, <span>{{username}}</span></h1>
-              <h6 class="font-desc">Jangan lupa untuk selalu mengerjakan tugasnya sesuai waktu yang ditentukan ya!</h6>
-            </div>
-
-            <div class="project-container w-100">
-              <h4 class="font-title project-wrapper-title">Finished Projects</h4>
-
-              <div class="project-list-wrapper pt-3">
-                <swiper
-                  :slidesPerGroup="1"
-                  :loop="true"
-                  :pagination="{
-                    clickable: true,
-                  }"
-                  :breakpoints="{
-                    '640': {
-                      slidesPerView: 1
-                    },
-                    '768': {
-                      slidesPerView: 2
-                    },
-                    '1024': {
-                      slidesPerView: 3
-                    }
-                  }"
-                  :navigation="true"
-                  :modules="modules"
-                  class="mySwiper"
-                >
-                  <swiper-slide v-for="(project, index) in projects" :key="index" class="swipe">
-                    <div class="project">
-                      <div class="img">
-                        <img src="@/assets/logo.png">
-                      </div>
-                      <div class="project-content">
-                        <div class="title mb-3">
-                          <h5 class="font-title">{{project.title}}</h5>
-                        </div>
-                        <div class="desc">
-                          <h6>{{project.desc}}</h6>
-                        </div>
-                      </div>
-                    </div>
-                  </swiper-slide>
-                </swiper>
-              </div>
+              <h6 class="font-desc">Update selalu progress pengerjaan web kamu disini!</h6>
             </div>
           </div>
       </div>
@@ -63,16 +19,11 @@
 import PageHeader from '@/components/Header/PageHeader.vue'
 import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
 import { auth } from '@/firebase'
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import "swiper/css"
-import "swiper/css/pagination";
-import "swiper/css/navigation";
-import { Pagination, Navigation } from 'swiper'
 // import { useStore } from 'vuex'
 
 export default {
   name: 'UserDashboard',
-  components: { PageHeader, UserRoutes, Swiper, SwiperSlide },
+  components: { PageHeader, UserRoutes },
   data() {
     return {
       username: "",
@@ -115,11 +66,6 @@ export default {
         console.log(error.message)
       }
     }
-  },
-  setup() {
-    return {
-      modules: [Pagination, Navigation]
-    }
   }
 }
 </script>
@@ -151,76 +97,6 @@ export default {
       justify-content: center;
       .user-img {
         margin-bottom: 2rem;
-      }
-    }
-  }
-
-  .project-container {
-    .project-wrapper-title {
-      position: relative;
-      padding-left: 1rem;
-
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border-left: 5px solid $secondary-color;
-      }
-    }
-  }
-
-  .project-list-wrapper {
-    width: 90%;
-    .mySwiper {
-      list-style: none;
-      padding-left: 0;
-      .swiper-pagination {
-        transform: translateY(1rem);
-      }
-      .swiper-pagination-bullet-active {
-        background: $dark;
-      }
-      .swipe {
-        margin-bottom: 2rem;
-        .project {
-          width: 300px;
-          height: 350px;
-          background: $white;
-          border-radius: 15px;
-          box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-          .img {
-            width: 100%;
-            height: 60%;
-            border-radius: 15px;
-            display: grid;
-            place-items: center;
-            background: $dark;
-            img {
-              width: 50%;
-            } 
-          }
-          .project-content {
-            width: 100%;
-            height: 40%;
-            border-radius: 0 0 15px 15px;
-            background: $white;
-            padding: 1rem;
-          }
-        }
-      }
-    }
-  }
-
-  @media screen and (max-width: 768px) {
-    .project-list-wrapper {
-      width: 100%;
-
-      .project {
-        width: 100%;
-        height: 250px;
       }
     }
   }
