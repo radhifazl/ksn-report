@@ -1,15 +1,16 @@
 <template>
-  <div class="lapor-progress-wrapper d-flex">
-    <div class="lapor-progress" style="height: 100vh">
+  <div class="lapor-kendala-wrapper d-flex bg-col">
+    <div class="lapor-kendala" style="height: 100vh">
       
       <PageHeader>
         <UserRoutes />
       </PageHeader>
 
       <div class="lapor-header text-center p-4">
-          <h2 class="font-title mb-2 mt-3" id="welcome-text">
+          <h2 class="font-title mb-2" id="welcome-text">
             Lapor Kendala
           </h2>
+          <span>*Lihat laporan terakhir yang kamu kirim di bawah.</span>
       </div>
 
       <div class="laporan-container p-4 pt-2">
@@ -67,20 +68,19 @@
                   <i class='bx-fw bx bxs-send'></i> Submit Laporan
                 </div>
               </button>
-              <span v-if="isKendalaSent">*Lihat laporan terakhir yang kamu kirim di bawah.</span>
             </SubmitButton>
           </form>
         </div>
       </div>
       
-      <div class="submitted-report-wrapper mt-3 p-4" v-if="isKendalaSent">
+      <div class="submitted-report-wrapper p-4" v-if="isKendalaSent"> <!--  -->
           <div class="wrapper-title mb-3">
-            <button class="see-report-btn mx-auto d-flex align-items-center" @click="getLastReport" :disabled="isDsabled">
+            <button class="see-report-btn mx-auto d-flex align-items-center" @click="getLastReport" :disabled="isDisabled"> <!-- -->
               <i class='bx-fw bx bxs-chevron-right'></i> 
               <h5>Lihat Laporan Yang Sudah Dikirim</h5>
             </button>
           </div>
-          <div class="report-wrapper mx-auto" v-if="lastReport.length > 0">
+          <div class="report-wrapper mx-auto" v-if="lastReport.length < 2">
             <div class="report-item" v-for="(report, i) in lastReport" :key="i">
               <div class="submitted-wrapper">
                 <div class="item-box box-nama">
@@ -110,8 +110,8 @@
                 <UpdateButton @editReport="popEditForm = true"/>
               </div>
 
-              <div class="update-form-wrapper w-100" v-if="popEditForm">
-                <form id="edit-form" class="p-4" @submit.prevent="editReport(report.id)">
+              <div class="update-form-wrapper w-100" v-if="popEditForm"> <!---->
+                <form id="edit-form" class="p-2" @submit.prevent="editReport(report.id)">
                   <div class="form-title d-flex align-items-center justify-content-center">
                     <i class='bx-fw bx bxs-edit'></i>
                     <h5>Update Laporan</h5>
@@ -203,14 +203,15 @@ export default {
           })
         } else {
           this.loading = true
-          await addDoc(collection(firestore, 'kendala', this.user.displayName, this.user.displayName), {
+          await addDoc(collection(firestore, 'user', 'kendala', this.user.uid), {
             id: uuid(),
             name: this.formLaporan.name,
             uid: this.formLaporan.uid,
             team: this.formLaporan.team,
             email: this.formLaporan.email,
             namatugas: this.formLaporan.namatugas,
-            desc: this.formLaporan.desc
+            desc: this.formLaporan.desc,
+            date: this.getDate(new Date())
           }).then(() => {
             Toast.fire({
               title: 'Laporan berhasil dikirim!',
@@ -241,13 +242,13 @@ export default {
         }
       },
       async getLastReport() {
-        this.isDisabled = true
-        const docSnap = await getDocs(collection(firestore, 'kendala', this.user.displayName, this.user.displayName))
+        const docSnap = await getDocs(collection(firestore, 'user', 'kendala', this.user.uid))
         docSnap.forEach(doc => {
           this.kendalaUser.push({...doc.data(), id: doc.id})
         })
         if(this.kendalaUser.length > 1) {
           this.lastReport.push(this.kendalaUser[0])
+          this.isDisabled = true
         } else {
           this.lastReport = []
         }
@@ -263,7 +264,7 @@ export default {
           confirmButtonText: 'Ya, hapus laporan!'
         }).then((result) => {
           if (result.isConfirmed) {
-            deleteDoc(doc(firestore, 'kendala', this.user.displayName, this.user.displayName, id))
+            deleteDoc(doc(firestore, 'user', 'kendala', this.user.uid, id))
             Swal.fire(
               'Terhapus!',
               'Laporan berhasil dihapus.',
@@ -284,10 +285,11 @@ export default {
             confirmButtonText: 'Oke',
           })
         } else {
-          updateDoc(doc(firestore, 'kendala', this.user.displayName, this.user.displayName, id), {
+          updateDoc(doc(firestore, 'user', 'kendala', this.user.uid, id), {
             name: this.updateForm.updateNama,
             namatugas: this.updateForm.updateNamatugas,
-            desc: this.updateForm.updateDesc
+            desc: this.updateForm.updateDesc,
+            date: this.getDate(new Date())
           }).then(() => {
             Toast.fire({
               title: 'Laporan berhasil diperbarui!',
@@ -309,7 +311,14 @@ export default {
             })
           })
         }
-
+      },
+      getDate(date) {
+        const ddmmyyy = this.padTo2Digits(date.getDate()) + '/' + this.padTo2Digits(date.getMonth()+1) + '/' + date.getFullYear()
+        const now = ddmmyyy 
+        return now
+      },
+      padTo2Digits(num) {
+        return num.toString().padStart(2, '0')
       }
     },
 }
@@ -320,14 +329,21 @@ export default {
 @import "@/styles/submittedreport.scss";
 @import "@/styles/updateform.scss";
 
-.lapor-progress-wrapper {
-  background-color: rgb(241, 241, 241);
-}
-.lapor-progress {
+.lapor-kendala {
   width: 100%;
   height: 100%;
 }
+.lapor-header {
+  span {
+    color: #888;
+  }
 
+  @media screen and (max-width: 768px) {
+    span {
+      font-size: 0.938rem;
+    }
+  }
+}
 .laporan-container {
   .form-wrapper {
     width: 50%;

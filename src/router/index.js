@@ -32,6 +32,14 @@ const routes = [
     }
   },
   {
+    path: '/admin/:uid/listkendala',
+    name: 'ListKendala',
+    component: () => import('../views/admin/Kendala/ListKendala.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/user/:uid/tugas',
     name: 'usertugas',
     component: () => import('../views/user/pages/ProjectTugas.vue'),

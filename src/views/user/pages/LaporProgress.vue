@@ -1,5 +1,5 @@
 <template>
-  <div class="lapor-progress-wrapper d-flex">
+  <div class="lapor-progress-wrapper d-flex bg-col">
     <div class="lapor-progress" style="height: 100vh">
       <PageHeader>
         <UserRoutes />
@@ -9,6 +9,7 @@
           <h2 class="font-title mb-2 mt-3" id="welcome-text">
             Lapor Progress
           </h2>
+          <span v-if="isKendalaSent">*Lihat laporan terakhir yang kamu kirim di bawah.</span>
       </div>
 
       <div class="laporan-container p-4 pt-2">
@@ -68,7 +69,6 @@
                   <i class='bx-fw bx bxs-send'></i> Submit Laporan
                 </div>
               </button>
-              <span v-if="isKendalaSent">*Lihat laporan terakhir yang kamu kirim di bawah.</span>
             </SubmitButton>
           </form>
         </div>
@@ -195,7 +195,6 @@ export default {
     },
     methods: {
       async sendProgress() {
-        let pattern = /https:\/\/gitlab\.com\//i;
         if(!this.formLaporan.name || !this.formLaporan.namatugas || !this.formLaporan.gitlablink) {
           Toast.fire({
             icon: 'error',
@@ -203,13 +202,14 @@ export default {
           })
         } else {
           this.loading = true
-          await addDoc(collection(firestore, 'progress', this.user.displayName, this.user.displayName), {
+          await addDoc(collection(firestore, 'user', 'progress', this.user.uid), {
             id: uuid(),
             name: this.formLaporan.name,
             team: this.formLaporan.team,
             email: this.formLaporan.email,
             namatugas: this.formLaporan.namatugas,
-            gitlablink: this.formLaporan.gitlablink
+            gitlablink: this.formLaporan.gitlablink,
+            date: this.getDate(new Date())
           }).then(() => {
             Toast.fire({
               title: 'Laporan berhasil dikirim!',
@@ -244,7 +244,7 @@ export default {
       },
       async getLastReport() {
         this.isDisabled = true
-        const docSnap = await getDocs(collection(firestore, 'progress', this.user.displayName, this.user.displayName))
+        const docSnap = await getDocs(collection(firestore, 'user', 'progress', this.user.uid))
         docSnap.forEach(doc => {
           this.progressUser.push({...doc.data(), id: doc.id})
         })
@@ -265,7 +265,7 @@ export default {
           confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
           if (result.isConfirmed) {
-            deleteDoc(doc(firestore, 'progress', this.user.displayName, this.user.displayName, id))
+            deleteDoc(doc(firestore, 'user', 'progress', this.user.uid, id))
             .then(() => {
               Swal.fire(
                 'Terhapus!',
@@ -286,10 +286,11 @@ export default {
             confirmButtonText: 'Oke',
           })
         } else {
-          updateDoc(doc(firestore, 'kendala', this.user.displayName, this.user.displayName, id), {
+          updateDoc(doc(firestore, 'user', 'progress', this.user.uid, id), {
             name: this.updateForm.updateNama,
             namatugas: this.updateForm.updateNamatugas,
-            gitlablink: this.updateForm.updateLink
+            gitlablink: this.updateForm.updateLink,
+            date: this.getDate(new Date())
           }).then(() => {
             Toast.fire({
               title: 'Laporan berhasil diperbarui!',
@@ -310,7 +311,14 @@ export default {
             })
           })
         }
-
+      },
+      getDate(date) {
+        const ddmmyyy = this.padTo2Digits(date.getDate()) + '/' + this.padTo2Digits(date.getMonth()+1) + '/' + date.getFullYear()
+        const now = ddmmyyy 
+        return now
+      },
+      padTo2Digits(num) {
+        return num.toString().padStart(2, '0')
       }
     }
 }
@@ -319,14 +327,24 @@ export default {
 <style lang="scss">
 @import "@/styles/base.scss";
 @import "@/styles/submittedreport.scss";
+@import "@/styles/updateform.scss";
 
-.lapor-progress-wrapper {
-  background-color: rgb(241, 241, 241);
-}
 
 .lapor-progress {
   width: 100%;
   height: 100%;
+}
+
+.lapor-header {
+  span {
+    color: #888;
+  }
+
+  @media screen and (max-width: 768px) {
+    span {
+      font-size: 0.938rem;
+    }
+  }
 }
 
 .laporan-container {

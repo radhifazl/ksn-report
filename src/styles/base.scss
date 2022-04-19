@@ -13,6 +13,7 @@ $bg-color: #FFFFFF;
 $white: #FFFFFF;
 $black: #080808;
 $dark: #252331;
+$hoverdark: #363344;
 
 
 * {
@@ -54,4 +55,8 @@ a {
 
 .font-desc-2 {
     font-family: $third-font;
+}
+
+.bg-col {
+    background-color: rgb(241, 241, 241);
 }

@@ -18,7 +18,9 @@
 <script>
 import PageHeader from '@/components/Header/PageHeader.vue'
 import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
-import { auth } from '@/firebase'
+import { auth, firestore } from '@/firebase'
+import { doc, setDoc } from "firebase/firestore";
+import { onAuthStateChanged } from '@firebase/auth';
 // import { useStore } from 'vuex'
 
 export default {
@@ -26,33 +28,25 @@ export default {
   components: { PageHeader, UserRoutes },
   data() {
     return {
-      username: "",
-      projects: [
-        {
-          title: 'Java Vibes',
-          desc: 'Invitation web bertemakan adat dari suku jawa',
-        },
-        {
-          title: 'Beautiful Wood',
-          desc: 'Invitation web bertemakan kayu indah',
-        },
-        {
-          title: 'Dark Grey',
-          desc: 'Invitation web dengan tema palette abu gelap',
-        },
-        {
-          title: 'Pink Flowers',
-          desc: 'Invitation web bertemakan bunga yang indah berwarna merah muda',
-        },
-        {
-          title: 'Dark Gold',
-          desc: 'Invitation web bertemakan warna gelap dan juga emas',
-        },
-      ]
+      username: ""
     }
   },
-  mounted() {
+  created() {
     this.getUserInfo(auth.currentUser)
+
+    onAuthStateChanged(auth, user => {
+      if(user) {
+        if(user.uid !== "aJBM7W9ML5TPSMYEU6gD9xOFbYt1") {
+          setDoc(doc(firestore, 'users', user.uid), {
+            name: user.displayName,
+            email: user.email,
+            uid: user.uid,
+          })
+        }
+      } else {
+        console.log('Logged out')
+      }
+    })
   },
   methods: {
     async getUserInfo(user) {

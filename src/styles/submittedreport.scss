@@ -10,6 +10,10 @@
         outline: none;
         background: transparent;
         font-family: $first-font;
+
+        &:hover {
+          color: $secondary-color;
+        }
       }
     }
 
@@ -60,18 +64,20 @@
             h5 {
               font-size: 1.2rem;
               text-align: left;
-              padding-left: 0.5rem;
             }
           }
         }
   
         .report-wrapper {
+          width: 100%;
           .report-item {
             .item-box {
               flex-direction: column;
+              .label, .label.label.label-kendala{
+                width: 100%;
+              }
               p {
                 width: 100%;
-              padding-left: 0.8rem;
               }
   
             }

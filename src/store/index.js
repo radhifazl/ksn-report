@@ -1,14 +1,14 @@
 import { createStore } from 'vuex'
 import router from '../router'
-import { auth } from '../firebase'
+import { auth, firestore } from '../firebase'
 import { 
-  // createUserWithEmailAndPassword, 
-  // signInWithEmailAndPassword,
   signInWithPopup, 
   GoogleAuthProvider, 
-  signOut 
+  signOut, 
+  onAuthStateChanged
 } from 'firebase/auth'
 import { Toast } from "@/plugins/Toast";
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 
 export default createStore({
   state: {

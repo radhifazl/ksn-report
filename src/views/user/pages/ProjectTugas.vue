@@ -1,9 +1,9 @@
 <template>
-  <div class="project-tugas-wrapper ccontainer d-flex">
-      <div class="project-tugas cwrap">
-        <page-header>
-          <user-routes />
-        </page-header>
+  <div class="project-tugas-wrapper d-flex bg-col">
+      <div class="project-tugas">
+        <PageHeader>
+          <UserRoutes />
+        </PageHeader>
         <div class="tugas-content p-4">
           <div class="tugas-header d-flex justify-content-between align-items-center">
             <h2 class="font-title mb-4" id="welcome-text">
@@ -29,117 +29,7 @@
               </div>
 
               <div class="tugas-report-btn">
-                <router-link to="/user/progress">
-                  <i class='bx-fw bx bxs-report'></i> Lapor Progress
-                </router-link>
-              </div>
-            </div>
-            <div class="tugas p-3">
-              <div class="tugas-header mb-4">
-                <h4 class="tugas-title font-title">Love Flower</h4>
-              </div>
-              <div class="tugas-content">
-                <div class="figma-link-wrapper d-flex justify-content-between align-items-center">
-                  <h6 class="figma-title font-title">Figma :</h6>
-                  <a class="figma-link font-title">Test</a>
-                </div>
-
-                <div class="gitlab-link-wrapper d-flex justify-content-between align-items-center">
-                  <h6 class="gitlab-title font-title">Gitlab :</h6>
-                  <a class="gitlab-link font-title">Test</a>
-                </div>
-              </div>
-
-              <div class="tugas-report-btn">
-                <router-link to="/user/progress">
-                  <i class='bx-fw bx bxs-report'></i> Lapor Progress
-                </router-link>
-              </div>
-            </div>
-            <div class="tugas p-3">
-              <div class="tugas-header mb-4">
-                <h4 class="tugas-title font-title">Flower Purple</h4>
-              </div>
-              <div class="tugas-content">
-                <div class="figma-link-wrapper d-flex justify-content-between align-items-center">
-                  <h6 class="figma-title font-title">Figma :</h6>
-                  <a class="figma-link font-title">Test</a>
-                </div>
-
-                <div class="gitlab-link-wrapper d-flex justify-content-between align-items-center">
-                  <h6 class="gitlab-title font-title">Gitlab :</h6>
-                  <a class="gitlab-link font-title">Test</a>
-                </div>
-              </div>
-
-              <div class="tugas-report-btn">
-                <router-link to="/user/progress">
-                  <i class='bx-fw bx bxs-report'></i> Lapor Progress
-                </router-link>
-              </div>
-            </div>
-            <div class="tugas p-3">
-              <div class="tugas-header mb-4">
-                <h4 class="tugas-title font-title">Dark Gold</h4>
-              </div>
-              <div class="tugas-content">
-                <div class="figma-link-wrapper d-flex justify-content-between align-items-center">
-                  <h6 class="figma-title font-title">Figma :</h6>
-                  <a class="figma-link font-title">Test</a>
-                </div>
-
-                <div class="gitlab-link-wrapper d-flex justify-content-between align-items-center">
-                  <h6 class="gitlab-title font-title">Gitlab :</h6>
-                  <a class="gitlab-link font-title">Test</a>
-                </div>
-              </div>
-
-              <div class="tugas-report-btn">
-                <router-link to="/user/progress">
-                  <i class='bx-fw bx bxs-report'></i> Lapor Progress
-                </router-link>
-              </div>
-            </div>
-            <div class="tugas p-3">
-              <div class="tugas-header mb-4">
-                <h4 class="tugas-title font-title">Sunflower</h4>
-              </div>
-              <div class="tugas-content">
-                <div class="figma-link-wrapper d-flex justify-content-between align-items-center">
-                  <h6 class="figma-title font-title">Figma :</h6>
-                  <a class="figma-link font-title">Test</a>
-                </div>
-
-                <div class="gitlab-link-wrapper d-flex justify-content-between align-items-center">
-                  <h6 class="gitlab-title font-title">Gitlab :</h6>
-                  <a class="gitlab-link font-title">Test</a>
-                </div>
-              </div>
-
-              <div class="tugas-report-btn">
-                <router-link to="/user/progress">
-                  <i class='bx-fw bx bxs-report'></i> Lapor Progress
-                </router-link>
-              </div>
-            </div>
-            <div class="tugas p-3">
-              <div class="tugas-header mb-4">
-                <h4 class="tugas-title font-title">Dark Grey</h4>
-              </div>
-              <div class="tugas-content">
-                <div class="figma-link-wrapper d-flex justify-content-between align-items-center">
-                  <h6 class="figma-title font-title">Figma :</h6>
-                  <a class="figma-link font-title">Test</a>
-                </div>
-
-                <div class="gitlab-link-wrapper d-flex justify-content-between align-items-center">
-                  <h6 class="gitlab-title font-title">Gitlab :</h6>
-                  <a class="gitlab-link font-title">Test</a>
-                </div>
-              </div>
-
-              <div class="tugas-report-btn">
-                <router-link to="/user/progress">
+                <router-link :to="'/user/'+uid+'/progress'">
                   <i class='bx-fw bx bxs-report'></i> Lapor Progress
                 </router-link>
               </div>
@@ -153,14 +43,29 @@
 <script>
 import PageHeader from '@/components/Header/PageHeader.vue'
 import UserRoutes from '@/components/SidebarRoutes/UserRoutes.vue'
+import { auth } from "@/firebase";
 export default {
   components: { PageHeader, UserRoutes },
   name: 'UserTugas',
+  data() {
+    return {
+      uid: auth.currentUser.uid
+    }
+  }
 }
 </script>
 
 <style lang="scss">
 @import '@/styles/base.scss';
+.project-tugas-wrapper {
+  width: 100%;
+  height: 100%;
+
+  .project-tugas {
+    width: 100%;
+  }
+}
+
 .tugas {
   width: 49%;
   height: 200px;
