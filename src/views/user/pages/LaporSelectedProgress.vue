@@ -46,27 +46,17 @@
                name="namatugas" 
                id="nama-tugas" 
                placeholder="Nama Tugas" minlength="10"
-               autocomplete="off" v-model="formLaporan.namatugas"
+               autocomplete="off" v-model="dataTugas.namaTugas" readonly
               >
             </div>
             <div class="laporan-gitlablink laporan-box">
               <input type="text" 
-               name="gitlab-link" 
+               name="gitlablink" 
                id="gitlab-link" 
                placeholder="Link Project (GitLab)" minlength="14"
-               autocomplete="off" v-model="formLaporan.gitlablink"
-               pattern="https://gitlab.com/ksnusantara/(.)+" title="Include https://gitlab.com/ksnusantara/ in the link"
+               autocomplete="off" v-model="dataTugas.link"
+               pattern="https?://gitlab.+" title="Include https://gitlab" readonly
               >
-            </div>
-
-            <div class="laporan-figmalink laporan-box">
-              <input type="text" 
-               name="figma-link" 
-               id="figma-link" 
-               placeholder="Link Design / Prototype (Figma)" minlength="14"
-               autocomplete="off" v-model="formLaporan.figmalink"
-               pattern="https://www.figma.com/file/(.)+" title="Include https://www.figma.com/file/ in the link">
-              
             </div>
 
             <div class="laporan-box">
@@ -116,7 +106,7 @@
                   <h6 class="label label-tugas"><i class='bx-fw bx bxs-circle'></i>Nama Tugas</h6>
                   <p>{{ report.namatugas }}</p>
                 </div>
-                <div class="item-box box-status">
+                <div class="item-box box-tugas">
                   <h6 class="label label-tugas"><i class='bx-fw bx bxs-circle'></i>Status Tugas</h6>
                   <p>{{ report.status }}</p>
                 </div>
@@ -151,24 +141,14 @@
                       <input type="text" id="editnamatugas" name="editnamatugas" autocomplete="off" v-model="updateForm.updateNamatugas">
                   </div>
 
-                  <div class="update update-gitlab">
-                    <label for="editgitlab">Update Link Repository</label>
-                    <input type="text" id="editgitlab" name="editgitlab" autocomplete="off" v-model="updateForm.updateLink"
-                    pattern="https://gitlab.com/ksnusantara/(.)+" title="Include https://gitlab.com/ksnusantara/ in the link">
+                  <div class="update update-desc">
+                    <label for="editgitlab">Link Gitlab</label>
+                    <input type="text" id="editgitlab" name="editgitlab" autocomplete="off" v-model="updateForm.updateLink">
                   </div>
 
-                  <div class="update update-figma">
-                    <label for="editfigma">Update Link Figma</label>
-                    <input type="text" id="editfigma" name="editfigma" autocomplete="off" v-model="updateForm.updateLinkFigma"
-                    pattern="https://www.figma.com/file/(.)+" title="Include https://www.figma.com/file/ in the link">
-                  </div>
-
-                  <div class="laporan-box">
-                      <select class="form-select form-select-sm font-desc mb-2" id="status-select" v-model="updateForm.updateStatus">
-                          <option value="Belum Dikerjakan" selected>Belum dikerjakan</option>
-                          <option value="Sedang Dikerjakan">Sedang dikerjakan</option>
-                          <option value="Selesai Dikerjakan">Selesai dikerjakan</option>
-                      </select>
+                  <div class="update update-desc">
+                    <label for="editstatus">Status Tugas</label>
+                    <input type="text" id="editstatus" name="editstatus" autocomplete="off" v-model="updateForm.updateStatus">
                   </div>
 
                   <button type="submit" class="update-btn">
@@ -200,9 +180,10 @@ import SubmitButton from '@/components/Buttons/SubmitButton.vue';
 import DeleteButton from '@/components/Buttons/DeleteButton.vue';
 import UpdateButton from '@/components/Buttons/UpdateButton.vue';
 import { getDate } from "@/plugins/Date";
+import router from '@/router'
 
 export default {
-    name: 'LaporProgress',
+    name: 'LaporSelectedProgress',
     components: {
       PageHeader, UserRoutes, SubmitButton, DeleteButton, UpdateButton
     },
@@ -214,10 +195,9 @@ export default {
           team: 'Development Team',
           email: auth.currentUser.email,
           uid: auth.currentUser.uid,
-          namatugas: this.$route.params.namaTugas,
+          namatugas: '',
           gitlablink: '',
-          figmalink: '',
-          status: ''
+          status: '',
         },
         isKendalaSent: false,
         loading: false,
@@ -228,39 +208,34 @@ export default {
           updateNama: '',
           updateNamatugas: '',
           updateLink: '',
-          updateLinkFigma: '',
-          updateStatus: ''
+          updateStatus: '',
         },
-        popEditForm: false
-      }
-    },
-    created() {
-      if(!this.formLaporan.namatugas) {
-        this.$router.push({
-          name: 'UserTugas'
-        })
+        popEditForm: false,
+        dataTugas: {
+            namaMurid: this.$route.params.nama,
+            namaTugas: this.$route.params.namaTugas,
+            link: this.$route.params.link,
+        }
       }
     },
     methods: {
       async sendProgress() {
-        if(!this.formLaporan.name || !this.formLaporan.namatugas || !this.formLaporan.gitlablink || !this.formLaporan.status) {
+        if(!this.dataTugas.namaMurid || !this.dataTugas.namaTugas || !this.dataTugas.link || !this.formLaporan.status) {
           Toast.fire({
             icon: 'error',
             title: 'Mohon lengkapi form progress dengan benar!',
           })
         } else {
           this.loading = true
-          await setDoc(doc(firestore, 'admin', 'tugas', this.user.uid, this.formLaporan.namatugas), {
-            uid: this.user.uid,
-            id: this.$route.params.id,
-            name: this.formLaporan.name,
+          await setDoc(collection(firestore, 'user', 'tugas', this.user.uid), {
+            id: uuid(),
+            name: this.dataTugas.namaMurid,
             team: this.formLaporan.team,
             email: this.formLaporan.email,
-            namatugas: this.formLaporan.namatugas,
-            gitlablink: this.formLaporan.gitlablink,
-            figmalink: this.formLaporan.figmalink,
+            namatugas: this.dataTugas.namaTugas,
+            gitlablink: this.dataTugas.link,
             date: getDate(new Date()),
-            status: this.formLaporan.status
+            status: this.formLaporan.status,
           }).then(() => {
             Toast.fire({
               title: 'Laporan berhasil dikirim!',
@@ -289,9 +264,9 @@ export default {
             })
           })
           this.formLaporan.name = ''
+          this.formLaporan.namatugas = ''
           this.formLaporan.gitlablink = ''
-          this.formLaporan.figmalink = ''
-          this.formLaporan.status = ''
+          this.formLaporan.checkSelesai = false
         }
       },
       async getLastReport() {
@@ -342,9 +317,8 @@ export default {
             name: this.updateForm.updateNama,
             namatugas: this.updateForm.updateNamatugas,
             gitlablink: this.updateForm.updateLink,
-            figmalink: this.updateForm.updateLinkFigma,
             date: getDate(new Date()),
-            status: this.updateForm.updateStatus
+            status: this.updateForm.updateStatus,
           }).then(() => {
             Toast.fire({
               title: 'Laporan berhasil diperbarui!',
@@ -366,6 +340,13 @@ export default {
           })
         }
       }
+    },
+    created() {
+        if(!this.dataTugas.link) {
+            this.$router.push({
+                name: 'UserTugas'
+            })
+        }
     }
 }
 </script>

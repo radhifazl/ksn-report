@@ -5,13 +5,13 @@
     </router-link>
   </li>
   <li class="nav-list">
-    <router-link :to="'/admin/'+uid+'/tugas'">
+    <router-link :to="'/admin/'+uid+'/sendtugas'">
       <i class='bx-fw bx bx-task'></i> Beri Tugas
     </router-link>
   </li>
   <li class="nav-list">
     <router-link :to="'/admin/'+uid+'/progress'">
-      <i class='bx-fw bx bxs-report' ></i> Laporan Progress
+      <i class='bx-fw bx bxs-report' ></i> Laporan Tugas
     </router-link>
   </li>
   <li class="nav-list">
@@ -20,7 +20,7 @@
     </router-link>
   </li>
   <li class="nav-list">
-    <router-link to="/discussion">
+    <router-link :to="'/discussion/'+uid">
       <i class='bx-fw bx bxs-conversation'></i> Diskusi KSN
     </router-link>
   </li>

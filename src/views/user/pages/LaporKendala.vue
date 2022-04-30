@@ -6,7 +6,7 @@
         <UserRoutes />
       </PageHeader>
 
-      <div class="lapor-header text-center p-4">
+      <div class="lapor-header text-center p-4 padtop">
           <h2 class="font-title mb-2" id="welcome-text">
             Lapor Kendala
           </h2>
@@ -163,6 +163,7 @@ import Swal from "sweetalert2";
 import SubmitButton from "@/components/Buttons/SubmitButton.vue";
 import DeleteButton from "@/components/Buttons/DeleteButton.vue";
 import UpdateButton from '@/components/Buttons/UpdateButton.vue';
+import { getDate } from "@/plugins/Date";
 
 export default {
     name: 'LaporKendala',
@@ -211,7 +212,7 @@ export default {
             email: this.formLaporan.email,
             namatugas: this.formLaporan.namatugas,
             desc: this.formLaporan.desc,
-            date: this.getDate(new Date())
+            date: getDate(new Date())
           }).then(() => {
             Toast.fire({
               title: 'Laporan berhasil dikirim!',
@@ -289,7 +290,7 @@ export default {
             name: this.updateForm.updateNama,
             namatugas: this.updateForm.updateNamatugas,
             desc: this.updateForm.updateDesc,
-            date: this.getDate(new Date())
+            date: getDate(new Date())
           }).then(() => {
             Toast.fire({
               title: 'Laporan berhasil diperbarui!',
@@ -312,14 +313,6 @@ export default {
           })
         }
       },
-      getDate(date) {
-        const ddmmyyy = this.padTo2Digits(date.getDate()) + '/' + this.padTo2Digits(date.getMonth()+1) + '/' + date.getFullYear()
-        const now = ddmmyyy 
-        return now
-      },
-      padTo2Digits(num) {
-        return num.toString().padStart(2, '0')
-      }
     },
 }
 </script>

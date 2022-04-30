@@ -31,29 +31,58 @@ const routes = [
       requiresAuth: true
     }
   },
+  // ----------------------------- ADMIN ROUTES ----------------------------- //
   {
     path: '/admin/:uid/listkendala',
     name: 'ListKendala',
     component: () => import('../views/admin/Kendala/ListKendala.vue'),
+    props: true,
     meta: {
       requiresAuth: true
     }
   },
   {
+    path: '/admin/:uid/detailkendala/:id',
+    name: 'DetailKendala',
+    component: () => import('../views/admin/Kendala/DetailKendala.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/admin/:uid/sendtugas',
+    name: 'SendTugas',
+    component: () => import('../views/admin/BeriTugas/Tugas.vue'),
+    meta: {
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/admin/:uid/progress',
+    name: 'ProgressMurid',
+    component: () => import('../views/admin/Progress/ProgressMurid.vue'),
+    meta: {
+      requiresAuth: true
+    },
+  },
+  // ----------------------------- USER ROUTES ----------------------------- //
+  {
     path: '/user/:uid/tugas',
-    name: 'usertugas',
+    name: 'UserTugas',
     component: () => import('../views/user/pages/ProjectTugas.vue'),
     meta: {
       requiresAuth: true
-    }
+    },
+    props: true
   },
   {
-    path: '/user/:uid/progress',
+    path: '/user/:uid/progress/:id',
     name: 'LaporProgress',
     component: () => import('../views/user/pages/LaporProgress.vue'),
     meta: {
       requiresAuth: true
-    }
+    },
+    props: true
   },
   {
     path: '/user/:uid/kendala',
@@ -64,7 +93,31 @@ const routes = [
     }
   },
   {
-    path: '/discussion',
+    path: '/user/:uid/inbox',
+    name: 'InboxKendala',
+    component: () => import('../views/user/pages/InboxKendala.vue'),
+    meta: {
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/user/:uid/reply/:id',
+    name: 'ReplyKendala',
+    component: () => import('../views/user/pages/ReplyKendala.vue'),
+    meta: {
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/user/:uid/reply/:id',
+    name: 'ReplyKendala',
+    component: () => import('../views/user/pages/ReplyKendala.vue'),
+    meta: {
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/discussion/:uid',
     name: 'Discussion Chat',
     component: () => import('../views/DiscussionChat.vue'),
     meta: {

@@ -5,7 +5,7 @@
               <AdminRoutes v-if="admin"/>
               <UserRoutes v-else/>
           </PageHeader>
-          <div class="discussion-content w-100">
+          <div class="discussion-content w-100 padtop">
               <div class="discussion-view container-fluid">
                   <Chat />
               </div>

@@ -1,10 +1,21 @@
 <template>
   <div class="page-header w-100 d-flex justify-content-between align-items-center">
-      <div class="display-username d-flex align-items-center gap-3">
-          <img :src="profile" alt="Profile" class="profile-head">
-          <h1 class="font-title" id="username">{{ username }}</h1> 
-          <span class="font-desc header-team" id="display-team">Development Team</span>
+      <div class="user-info" v-if="isUser">
+        <div class="display-username d-flex align-items-center gap-3">
+            <img :src="profilInfo.photoURL" alt="Profile" class="profile-head">
+            <h1 class="font-title" id="username">{{ profilInfo.name }}</h1> 
+            <span class="font-desc header-team" id="display-team">Development Team</span>
+        </div>
       </div>
+
+      <div class="admin-info" v-else>
+        <div class="display-username d-flex align-items-center gap-3" v-for="(admin, i) in adminInfo" :key="i">
+            <img :src="admin.photoURL" alt="Profile" class="profile-head">
+            <h1 class="font-title" id="username">{{ admin.name }}</h1> 
+            <span class="font-desc header-team" id="display-team">{{admin.team}}</span>
+        </div>
+      </div>
+
       <div class="sidebar pt-2" :class="{active: isActive}">
         <div class="sidebar-contents">
           <ul class="nav-items">
@@ -37,6 +48,8 @@
 <script>
 import { auth } from '@/firebase'
 import { useStore } from 'vuex'
+import { firestore } from "@/firebase";
+import { getDoc, doc } from '@firebase/firestore'
 
 export default {
   name: 'PageHeader',
@@ -45,12 +58,14 @@ export default {
       user: auth.currentUser,
       username: "",
       profile: "",
-      isActive: false
+      isActive: false,
+      profilInfo: [],
+      isUser: true,
+      adminInfo: [],
     }
   },
   created() {
-    this.username = this.user.displayName
-    this.profile = this.user.photoURL
+    this.getProfile()
   },
   methods: {
     openMenu() {
@@ -58,6 +73,22 @@ export default {
         this.isActive = true
       } else {
         this.isActive = false
+      }
+    },
+    async getProfile() {
+      if(auth.currentUser.uid == "aJBM7W9ML5TPSMYEU6gD9xOFbYt1") {
+        this.isUser = false
+        this.adminInfo.push({
+          name: auth.currentUser.displayName,
+          photoURL: require("@/assets/images/noprofile.png"),
+          team: 'Admin'
+        })
+      } else {
+        await getDoc(doc(firestore, 'users', this.user.uid)).then(res => {
+          this.profilInfo = res.data()
+        }).catch(err => {
+          console.log(err)
+        })
       }
     }
   },
@@ -82,7 +113,8 @@ export default {
         box-shadow: 3px 3px 4px rgba($color: #00000056, $alpha: 0.3);
         height: 4rem;
         padding: 1rem;
-        position: relative;
+        position: fixed;
+        z-index: 1000;
 
         .profile-head {
           width: 40px;
@@ -104,7 +136,7 @@ export default {
         }
 
         .sidebar {
-          position: absolute;
+          position: fixed;
           top: 0;
           left: -100%;
           width: 85%;

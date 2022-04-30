@@ -5,7 +5,7 @@
           <h2 class="font-title">
               Cari User
           </h2>
-          <span class="font-desc-2" style="font-style: italic; color: #888;">
+          <span class="font-desc-2" style="font-style: italic; color: #C7C7C7;">
               {{ foundUser }}
           </span>
       </div>
@@ -22,7 +22,7 @@
       </div>
       <ul class="users" v-if="result">
           <li v-for="(user, i) in filtUser" :key="'user-'+i" class="user">
-              <button class="userlist-btn font-desc-2" @click="getUser(user.uid)">
+              <button class="userlist-btn font-desc-2" @click="getUser(user.uid, user.name, user.email)" :class="{selected: isSelected}">
                   {{user.name}}
               </button>
           </li>
@@ -41,16 +41,20 @@ export default {
             filtUser: [],
             query: '',
             result: false,
+            isSelected: false,
         }
     },
     computed: {
         foundUser() {
-            return this.query.length > 0 ? `User ditemukan (${this.filtUser.length})` : ''
+            if(this.query.length != '') {
+                return `User ditemukan (${this.filtUser.length})`
+            } else {
+                return ''
+            }
         }
     },
     created() {
         this.usersList()
-        console.log(this.users)
     },
     methods: {
         async usersList() {
@@ -59,6 +63,7 @@ export default {
                 this.users.push({
                     name: doc.data().name,
                     uid: doc.data().uid,
+                    email: doc.data().email,
                 })
             })
         },
@@ -72,10 +77,14 @@ export default {
                 this.result = false
             }
         },
-        getUser(id) {
+        getUser(id, name, email) {
+            this.result = false
             this.$emit('getUser', {
-                id: id
+                id: id,
+                name: name,
+                email: email,
             })
+            this.query = ''
         }
     }
 }
@@ -113,6 +122,11 @@ export default {
                     background: $hoverdark;
                     color: $white;
                 }
+            }
+
+            .userlist-btn.selected {
+                background: $dark;
+                color: $white;
             }
         }
         @keyframes list {

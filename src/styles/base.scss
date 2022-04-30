@@ -14,6 +14,7 @@ $white: #FFFFFF;
 $black: #080808;
 $dark: #252331;
 $hoverdark: #363344;
+$gray: #C7C7C7;
 
 
 * {
@@ -39,6 +40,10 @@ a {
 .cwrap {
     width: 100%;
     background-color: rgb(241, 241, 241);
+}
+
+.padtop {
+    padding-top: 5rem !important;
 }
 
 .bg-lightgrey {
