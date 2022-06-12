@@ -290,12 +290,14 @@ export default {
     }
 
     .footer {
+        transform: translateY(3rem);
         height: 8%;
 
         #msg-form {
             height: 100%;
             display: flex;
             align-items: center;
+            
             #message, .sendmsg-btn {
                 outline: none;
                 border: none;
@@ -303,6 +305,7 @@ export default {
                 caret-color: $white;
                 color: $white;
             }
+
             #message {
                 width: 90%;
                 height: 100%;

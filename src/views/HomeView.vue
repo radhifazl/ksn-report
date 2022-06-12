@@ -1,6 +1,6 @@
 <template>
   <div class="home w-100">
-      <home-header />
+      <HomeHeader />
       <div class="home-content pt-5 px-2 text-center">
           <div class="welcome-img my-5 my-lg-3">
               <img src="@/assets/images/vector/welcome.svg" alt="Welcome" class="welcome-vector">

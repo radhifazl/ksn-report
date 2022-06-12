@@ -11,12 +11,12 @@
         <div class="form-wrapper p-2">
           <form action="" @submit.prevent="sendTugas" id="send-tugas-form">
             <div class="input-box input-nama">
-              <label class="font-title" for="id_murid">ID Murid</label>
+              <label class="font-title" for="id_murid">ID User</label>
               <input 
                 type="text" 
                 name="id_murid"
                 id="id_murid" 
-                placeholder="Masukkan ID Murid" 
+                placeholder="Masukkan ID User" 
                 class="form-control" readonly
                 v-model="formTugas.id_murid"
               >
@@ -101,7 +101,7 @@
                   <i class='bx-fw bx bxs-send bx-fade-right' style="margin-right: 1rem"></i> Mengirim...
                 </button>
                 <button class="submitlaporan-btn p-2 px-4 w-100" type="submit" v-else>
-                  Kirim Tugas ke Murid
+                  Kirim Tugas
                 </button>
               </SubmitButton>
             </div>

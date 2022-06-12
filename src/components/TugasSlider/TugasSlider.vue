@@ -13,17 +13,17 @@
                 </div>
 
                 <div class="tasks task-finished">
-                    <h6 class="font-desc-2">Finished</h6>
+                    <h6 class="font-desc-2">Selesai Dikerjakan</h6>
                     <h6 class="font-title">{{ user.totalSelesai ? user.totalSelesai : 0 }}</h6>
                 </div>
 
                 <div class="tasks task-onprogress">
-                    <h6 class="font-desc-2">On Progress</h6>
+                    <h6 class="font-desc-2">Sedang Dikerjakan</h6>
                     <h6 class="font-title">{{ user.totalOnProgress ? user.totalOnProgress : 0 }}</h6>
                 </div>
 
                 <div class="tasks task-unfinished">
-                    <h6 class="font-desc-2">Unfinished</h6>
+                    <h6 class="font-desc-2">Belum Dikerjakan</h6>
                     <h6 class="font-title">{{ user.totalBelumSelesai ? user.totalBelumSelesai : 0 }}</h6>
                 </div>
             </div>
