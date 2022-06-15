@@ -1,5 +1,8 @@
 <template>
-  <div class="tugas-slider-wrapper w-100">
+  <div class="tugas-slider-wrapper w-100 d-flex flex-wrap align-items-center gap-3">
+      <button class="btn btn-danger" @click="exportPDF">
+          Export PDF
+      </button>
       <div class="tugas-user-box mt-3 mb-4" v-for="(user, i) in userInfo" :key="'user-'+i">
             <div class="tugas-user-header font-title p-3">
                 <h4>{{ user.name }}</h4>
@@ -34,13 +37,14 @@
 <script>
 import { firestore } from "@/firebase";
 import { getDocs, collection, query, where } from "firebase/firestore";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default {
     name: 'TugasSlider',
     data() {
         return {
             userInfo: [],
-            taskInfo: [],
         }
     },
     methods: {
@@ -51,10 +55,33 @@ export default {
                     this.userInfo.push(user.data());
                 })
             })
+        },
+        exportPDF() {
+            const doc = new jsPDF();
+            var data = []
+            for(let i = 0; i < this.userInfo.length; i++) {
+                data.push([
+                    this.userInfo[i].name,
+                    this.userInfo[i].email,
+                    this.userInfo[i].totalTugas,
+                    this.userInfo[i].totalSelesai,
+                    this.userInfo[i].totalOnProgress,
+                    this.userInfo[i].totalBelumSelesai,
+                ])
+            }
+
+            autoTable(doc, {
+                head: [['Nama', 'Email', 'Total Tugas', 'Selesai', 'Sedang Dikerjakan', 'Belum Selesai']],
+                body: data,
+            })
+            doc.save('User Task Info.pdf');
         }
     },
     created() {
         this.getUserInfo()
+    },
+    mounted() {
+        console.log(this.userInfo)
     }
 }
 </script>
